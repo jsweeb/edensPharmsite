@@ -50,7 +50,8 @@ export default async function ProductPage({ params }: Props) {
   const variants = await Promise.all(
     product.variants.map(async ({ id, label, preorderAllowed }) => {
       const inv = await getInventory(id).catch(() => null);
-      const inStock = !!inv && (inv.availableQty > 0 || inv.preorderAllowed);
+      // Unknown (lookup failed) stays undefined so the option isn't mislabelled.
+      const inStock = inv ? inv.availableQty > 0 || inv.preorderAllowed : undefined;
       return { id, label, preorderAllowed, inStock };
     }),
   );

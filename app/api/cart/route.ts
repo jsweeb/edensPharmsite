@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addToCart, CartFullError, MAX_QTY } from '@/app/lib/cart';
+import { addToCart, CartFullError, getCart, MAX_QTY } from '@/app/lib/cart';
+import { canPurchase } from '@/app/lib/stock';
 import { getInventory } from '@/app/lib/vineyard';
 
 /**
@@ -26,12 +27,23 @@ export async function POST(request: NextRequest) {
   ) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
   }
-  // Never let an out-of-stock (or unknown) variant into the cart, even if
-  // the client bypasses the disabled button.
+  // Never let an out-of-stock (or unknown) variant into the cart, or more
+  // units than are in stock, even if the client bypasses the disabled button.
   try {
     const inv = await getInventory(variantId);
-    if (inv.availableQty <= 0 && !inv.preorderAllowed) {
+    if (!canPurchase(inv, 1)) {
       return NextResponse.json({ error: 'This item is out of stock', code: 'out_of_stock' }, { status: 409 });
+    }
+    const inCart = (await getCart()).find((item) => item.variantId === variantId)?.qty ?? 0;
+    if (!canPurchase(inv, inCart + (qty as number))) {
+      return NextResponse.json(
+        {
+          error: `Only ${inv.availableQty} available`,
+          code: 'insufficient_stock',
+          available: Math.max(inv.availableQty - inCart, 0),
+        },
+        { status: 409 },
+      );
     }
   } catch (err) {
     console.error('Failed to check stock', err);

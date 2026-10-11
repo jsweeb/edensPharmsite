@@ -56,10 +56,10 @@ export async function getCart(): Promise<CartItem[]> {
 }
 
 /**
- * Persist the cart in the response cookies. Uses a path of '/' so
+ * Persist the cart in the response cookies (replaces the whole cart). Uses a path of '/' so
  * the cart is available on all routes. Serialises the cart as JSON.
  */
-async function saveCart(cart: CartItem[]): Promise<void> {
+export async function saveCart(cart: CartItem[]): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set({
     name: CART_COOKIE,

@@ -103,3 +103,24 @@ test('only the launch lineup can be bought', async ({ page, request }) => {
   expect(res.status()).toBe(409);
   expect((await res.json()).code).toBe('out_of_stock');
 });
+
+test('checkout drops cart lines that are no longer in stock', async ({ page, context, baseURL }) => {
+  // Simulate a cart saved before the launch lineup: one valid line, one now
+  // out of stock.
+  await context.addCookies([
+    {
+      name: 'cart',
+      value: JSON.stringify([
+        { variantId: 'hydrasal--raw', qty: 1 },
+        { variantId: 'elation-energy--standard', qty: 1 },
+      ]),
+      url: baseURL!,
+    },
+  ]);
+  await page.goto('/checkout');
+  await page.getByRole('button', { name: 'Proceed to Checkout' }).click();
+  await expect(page).toHaveURL(/\/checkout\?stock=1$/);
+  await expect(page.getByRole('alert').filter({ hasText: 'updated your cart' })).toBeVisible();
+  await expect(page.getByText('Hydrasal — Raw')).toBeVisible();
+  await expect(page.getByText('Elation Energy')).toHaveCount(0);
+});
