@@ -86,8 +86,10 @@ test('only the launch lineup can be bought', async ({ page, request }) => {
   await expect(page.getByTestId('stock-message')).toHaveText('Out of Stock');
   await expect(page.getByRole('button', { name: 'Add to Cart' })).toBeDisabled();
 
-  // Unbound sprays are available.
+  // Unbound solids and sprays are available in every concentration.
   await page.goto('/products/sanctus-una-unbound-fragrance');
+  await expect(page.getByLabel('Format')).toHaveValue('sanctus-una-unbound-fragrance--solid-edt');
+  await expect(page.getByTestId('stock-message')).toHaveText('In Stock');
   await page.getByLabel('Format').selectOption('sanctus-una-unbound-fragrance--spray-parfum');
   await expect(page.getByTestId('stock-message')).toHaveText('In Stock');
 

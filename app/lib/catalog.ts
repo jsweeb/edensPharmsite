@@ -77,8 +77,8 @@ const IMG = {
 const SOLID_CONCENTRATIONS = ['EDT', 'EDP', 'Extract'];
 const SPRAY_CONCENTRATIONS = ['EDC', 'EDT', 'EDP', 'Parfum', 'Extract'];
 type FragranceFormat = 'Solid' | 'Spray';
-const LAUNCH_SOLID: FragranceStock = { Solid: ['Extract'] };
-const LAUNCH_SPRAY: FragranceStock = { Spray: SPRAY_CONCENTRATIONS };
+const SANCTUM_LAUNCH: FragranceStock = { Solid: ['Extract'] };
+const FULL_LAUNCH: FragranceStock = { Solid: SOLID_CONCENTRATIONS, Spray: SPRAY_CONCENTRATIONS };
 
 /** Concentrations in stock at launch, per format. */
 type FragranceStock = Partial<Record<FragranceFormat, string[]>>;
@@ -278,11 +278,11 @@ export const catalog: CatalogProduct[] = [
   skincare('deodorant-balm', 'Deodorant Balm', 'Natural odor control in a tallow balm with arrowroot, magnesium hydroxide and zinc ricinoleate, scented with Sanctum.', ['Beef tallow', 'Beeswax', 'Jojoba oil', 'Arrowroot powder', 'Magnesium hydroxide', 'Zinc ricinoleate', 'Colloidal silver', 'Sanctum essential oil blend']),
 
   // ── Sanctus Unā fragrance ───────────────────────────────────────────────
-  // Launch lineup: all solids in Extract only; Redeemed and Unbound sprays
-  // in every concentration.
-  fragrance('Sanctum', ['Jasmine sambac', 'Ylang ylang', 'Cinnamon bark', 'Cardamom', 'Black currant', 'Atlas cedarwood', 'Vetiver', 'Vanilla', 'Peru balsam', 'Labdanum', 'Benzoin', 'Frankincense sacra', 'Osmanthus', 'Tonka bean', 'Cypriol (nagarmotha)', 'Tolu balsam', 'Clary sage', 'Black pepper', 'White pepper', 'Saffron'], LAUNCH_SOLID),
-  fragrance('Redeemed', ['Elderflower', 'Gardenia', 'Frankincense sacra', 'Cacao', 'Citron', 'Pomelo', 'Myrrh'], { ...LAUNCH_SOLID, ...LAUNCH_SPRAY }),
-  fragrance('Unbound', ['Honeysuckle', 'Texas cedarwood', 'Rose otto', 'Grapefruit', 'Yuzu', 'Balsam fir'], { ...LAUNCH_SOLID, ...LAUNCH_SPRAY }),
+  // Launch lineup: Sanctum solid in Extract only; Redeemed and Unbound in
+  // every solid and spray concentration.
+  fragrance('Sanctum', ['Jasmine sambac', 'Ylang ylang', 'Cinnamon bark', 'Cardamom', 'Black currant', 'Atlas cedarwood', 'Vetiver', 'Vanilla', 'Peru balsam', 'Labdanum', 'Benzoin', 'Frankincense sacra', 'Osmanthus', 'Tonka bean', 'Cypriol (nagarmotha)', 'Tolu balsam', 'Clary sage', 'Black pepper', 'White pepper', 'Saffron'], SANCTUM_LAUNCH),
+  fragrance('Redeemed', ['Elderflower', 'Gardenia', 'Frankincense sacra', 'Cacao', 'Citron', 'Pomelo', 'Myrrh'], FULL_LAUNCH),
+  fragrance('Unbound', ['Honeysuckle', 'Texas cedarwood', 'Rose otto', 'Grapefruit', 'Yuzu', 'Balsam fir'], FULL_LAUNCH),
   fragrance('Stoic', ['Amyris', 'Beeswax absolute', 'Rosewood', 'Vanilla', 'Violet', 'Hay', 'Orris', 'Tonka bean', 'Benzoin', 'Amber', 'Atlas cedarwood', 'Pink peppercorn']),
   fragrance('Tranquil', ['Violet leaf', 'Petitgrain bigarade', 'Basil', 'Bergamot', 'Bitter orange peel', 'Mandarin peel', 'Neroli', 'Jasmine grandiflorum', 'Cypress', 'Hinoki', 'Elemi', 'Frankincense frereana', 'Benzoin']),
   fragrance('Clarity', ['Lemon', 'Pink pepper', 'French lavender', 'Neroli', 'Petitgrain bigarade', 'Virginia cedarwood', 'Patchouli', 'Benzoin', 'Vanilla']),

@@ -26,16 +26,14 @@ describe('product catalog', () => {
 
   test('only the launch lineup is in stock', () => {
     const inStock = catalog.flatMap((p) => p.variants.filter((v) => v.available).map((v) => `${p.name}: ${v.label}`));
+    const solids = ['EDT', 'EDP', 'Extract'];
     const sprays = ['EDC', 'EDT', 'EDP', 'Parfum', 'Extract'];
+    const full = (name: string) => [
+      ...solids.map((c) => `${name} Fragrance: Solid – ${c}`),
+      ...sprays.map((c) => `${name} Fragrance: Spray – ${c}`),
+    ];
     expect(inStock.sort()).toEqual(
-      [
-        'Hydrasal: Raw',
-        'Sanctum Fragrance: Solid – Extract',
-        'Redeemed Fragrance: Solid – Extract',
-        'Unbound Fragrance: Solid – Extract',
-        ...sprays.map((c) => `Redeemed Fragrance: Spray – ${c}`),
-        ...sprays.map((c) => `Unbound Fragrance: Spray – ${c}`),
-      ].sort(),
+      ['Hydrasal: Raw', 'Sanctum Fragrance: Solid – Extract', ...full('Redeemed'), ...full('Unbound')].sort(),
     );
   });
 
