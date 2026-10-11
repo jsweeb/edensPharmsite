@@ -6,12 +6,14 @@ import Link from 'next/link';
  * Home page.
  *
  * Presents a hero banner, introductory copy and a grid of product lines. Each
- * card links to its product detail page. Only approved images are used. All
+ * card links to its product page, or to its section of the catalog when
+ * the line has several products. Only approved images are used. All
  * headings and links are properly structured for accessibility.
  */
 const productLines = [
   {
     slug: 'hydrasal',
+    href: '/products#hydrasal',
     name: 'Hydrasal',
     image: '/images/hydrasal.png',
     alt: 'Glass of Hydrasal electrolyte drink with lemon and botanicals',
@@ -21,6 +23,7 @@ const productLines = [
   },
   {
     slug: 'elation',
+    href: '/products#elation',
     name: 'Elation',
     image: '/images/elation.png',
     alt: 'Swirling pink tonic representing Elation adaptogenic drink',
@@ -30,6 +33,7 @@ const productLines = [
   },
   {
     slug: 'benedulce',
+    href: '/products/benedulce',
     name: 'BeneDulce',
     image: '/images/benedulce.jpg',
     alt: 'Cup filled with BeneDulce crystalline sweetener',
@@ -39,6 +43,7 @@ const productLines = [
   },
   {
     slug: 'sanctus-una',
+    href: '/products#sanctus-una',
     name: 'Sanctus Una',
     image: '/images/sanctus.png',
     alt: 'White blossom floating on dark water representing Sanctus Una skincare',
@@ -103,7 +108,7 @@ export default function HomePage() {
                 <h3 className="text-lg font-bold mb-2">{line.name}</h3>
                 <p className="flex-1 text-sm">{line.description}</p>
                 <Link
-                  href={`/products/${line.slug}`}
+                  href={line.href}
                   className={`mt-4 inline-block px-4 py-2 rounded ${line.button}`}
                 >
                   Shop {line.name}

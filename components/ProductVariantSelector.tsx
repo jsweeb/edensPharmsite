@@ -16,13 +16,15 @@ interface InventoryInfo {
 
 interface Props {
   variants: Variant[];
+  /** Label for the picker, e.g. "Flavor". */
+  optionName?: string;
 }
 
 const MAX_QTY = 99;
 
 type CartStatus = 'idle' | 'adding' | 'added' | 'error';
 
-export default function ProductVariantSelector({ variants }: Props) {
+export default function ProductVariantSelector({ variants, optionName = 'Variant' }: Props) {
   const [selectedId, setSelectedId] = useState(variants[0]?.id ?? '');
   // Inventory results are tagged with the variant they belong to so a stale
   // response is never shown for a newly selected variant.
@@ -89,7 +91,7 @@ export default function ProductVariantSelector({ variants }: Props) {
     <div className="space-y-4">
       <div>
         <label htmlFor="variant" className="block mb-1 font-bold">
-          Variant
+          {optionName}
         </label>
         <select
           id="variant"

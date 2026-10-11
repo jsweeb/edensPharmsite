@@ -12,7 +12,7 @@ test('user can browse products and initiate checkout', async ({ page }) => {
   await page.getByRole('navigation').getByRole('link', { name: 'Products' }).click();
   await expect(page).toHaveURL(/\/products$/);
 
-  await page.getByRole('link', { name: 'View Details' }).first().click();
+  await page.getByRole('link', { name: /View Details/ }).first().click();
   await expect(page).toHaveURL(/\/products\/[^/]+$/);
 
   await expect(page.getByTestId('stock-message')).not.toHaveText('Loading…');
@@ -25,11 +25,29 @@ test('user can browse products and initiate checkout', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Proceed to Checkout' })).toBeVisible();
 });
 
-test('home page product cards link to their product pages', async ({ page }) => {
+test('home page product cards link to the catalog', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Shop BeneDulce' }).click();
+  await expect(page).toHaveURL(/\/products\/benedulce$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'BeneDulce' })).toBeVisible();
+
   await page.goto('/');
   await page.getByRole('link', { name: 'Shop Elation' }).click();
-  await expect(page).toHaveURL(/\/products\/elation$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'Elation' })).toBeVisible();
+  await expect(page).toHaveURL(/\/products#elation$/);
+  await expect(page.getByRole('heading', { level: 2, name: 'Elation' })).toBeVisible();
+});
+
+test('every product in the sitemap has a working page', async ({ page, request }) => {
+  const sitemap = await (await request.get('/sitemap.xml')).text();
+  const paths = Array.from(sitemap.matchAll(/<loc>[^<]*?(\/products\/[^<]+)<\/loc>/g), (m) => m[1]);
+  expect(paths.length).toBe(35);
+  for (const path of paths) {
+    const res = await request.get(path);
+    expect(res.status(), path).toBe(200);
+  }
+  await page.goto('/products/hydrasal');
+  await expect(page.getByLabel('Flavor')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Ingredients' })).toBeVisible();
 });
 
 test('unknown product returns 404', async ({ page }) => {
