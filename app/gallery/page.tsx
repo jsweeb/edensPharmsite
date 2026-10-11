@@ -3,7 +3,7 @@ import Image from 'next/image';
 import React from 'react';
 
 export const metadata: Metadata = {
-  title: "Gallery | Eden's Pharm",
+  title: "Gallery",
   description:
     "Browse photos of Eden's Pharm products and the natural inspirations that shape them.",
 };
@@ -31,6 +31,7 @@ export default function GalleryPage() {
           src="/images/banner.png"
           alt="Eden's Pharm gallery banner"
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />
@@ -58,6 +59,7 @@ export default function GalleryPage() {
                 src={item.src}
                 alt={item.alt}
                 fill
+                sizes="(min-width: 768px) 33vw, 100vw"
                 className="object-cover"
               />
             </div>

@@ -10,14 +10,18 @@ describe('Vineyard adapter fallback', () => {
   test('getProduct returns variants', async () => {
     const products = await listProducts();
     const detail = await getProduct(products[0].slug);
-    expect(detail).toHaveProperty('variants');
-    expect(detail.variants.length).toBeGreaterThan(0);
+    expect(detail).not.toBeNull();
+    expect(detail!.variants.length).toBeGreaterThan(0);
+  });
+
+  test('getProduct returns null for an unknown slug', async () => {
+    expect(await getProduct('does-not-exist')).toBeNull();
   });
 
   test('getInventory returns availableQty', async () => {
     const products = await listProducts();
     const detail = await getProduct(products[0].slug);
-    const inv = await getInventory(detail.variants[0].id);
+    const inv = await getInventory(detail!.variants[0].id);
     expect(inv).toHaveProperty('availableQty');
     expect(typeof inv.availableQty).toBe('number');
   });

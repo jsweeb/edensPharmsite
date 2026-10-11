@@ -12,6 +12,13 @@ export default defineConfig({
     headless: true,
     ignoreHTTPSErrors: true,
   },
+  // Serve the production build (run `npm run build` first).
+  webServer: {
+    command: 'npm start',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 60 * 1000,
+  },
   projects: [
     {
       name: 'chromium',

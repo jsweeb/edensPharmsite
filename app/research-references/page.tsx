@@ -3,7 +3,7 @@ import Image from 'next/image';
 import React from 'react';
 
 export const metadata: Metadata = {
-  title: "Research References | Eden's Pharm",
+  title: "Research References",
   description:
     "Browse a selection of academic papers and resources that inform the formulation of Eden's Pharm products.",
 };
@@ -68,6 +68,7 @@ export default function ResearchReferencesPage() {
           src="/images/banner.png"
           alt="Eden's Pharm banner"
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />
@@ -94,7 +95,7 @@ export default function ResearchReferencesPage() {
                 href={ref.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-accent underline hover:text-highlight"
+                className="text-accent underline hover:text-sand"
               >
                 {ref.title}
               </a>

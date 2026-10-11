@@ -1,7 +1,7 @@
-# Eden’s Pharm — Next.js 14 App
+# Eden’s Pharm — Next.js App
 
 This repository contains a modern, accessible rewrite of the Eden’s Pharm
-website using **Next.js 14** with the **App Router**, **TypeScript** and
+website using **Next.js 16** (React 19) with the **App Router**, **TypeScript** and
 **Tailwind CSS**. The goal of this project is to faithfully reproduce
 the original static site while adding integrations for inventory and
 checkout workflows.
@@ -28,7 +28,8 @@ checkout workflows.
 * **SEO**: Each page defines a `metadata` export to set the page
   `<title>` and description. Open Graph data and social cards are
   included where appropriate. A static `robots.txt` and `sitemap.xml`
-  are provided under `public/`.
+  are generated from `app/robots.ts` and `app/sitemap.ts` using
+  `NEXT_PUBLIC_SITE_URL`.
 
 ### Phase B — Vineyard integration
 
@@ -68,12 +69,14 @@ checkout workflows.
   exercises a basic flow: visit home, navigate to a product page,
   add a variant to the cart and proceed to checkout.
 * **Continuous integration**: A GitHub Actions workflow in
-  `.github/workflows/ci.yml` installs dependencies, runs linting,
-  builds the project and executes unit and e2e tests on each push
-  or pull request. You can extend the workflow to include
+  `.github/workflows/ci.yml` installs dependencies, runs linting and
+  type checks, builds the project and executes unit and e2e tests on
+  each push or pull request. You can extend the workflow to include
   Lighthouse checks or deployment to Vercel.
 
 ## Local development
+
+Requires Node.js 20.9 or newer.
 
 ```bash
 # Install dependencies
@@ -85,10 +88,20 @@ npm run dev
 # Run the Jest unit tests
 npm run test
 
-# Run Playwright e2e tests (requires a build)
+# Lint and type check
+npm run lint
+npm run typecheck
+
+# Run Playwright e2e tests (requires a build; the server starts automatically)
 npm run build
 npm run e2e
 ```
+
+## Production
+
+Build once with `npm run build`, then start with either `npm start` or
+`node server.js` (for hosts such as cPanel/Passenger that need an entry
+file). Both honour the `PORT` environment variable.
 
 ## Environment variables
 
@@ -100,10 +113,12 @@ Vineyard and SamCart credentials. At minimum you will need:
 * `SAMCART_BASE_URL` – base URL of your SamCart API
 * `SAMCART_API_KEY` – secret token for SamCart
 * `SAMCART_WEBHOOK_SECRET` – shared secret for verifying webhooks
+* `NEXT_PUBLIC_SITE_URL` – public site URL (defaults to `https://edenspharm.com`)
 
-When these variables are not provided the adapters fall back to
+When the Vineyard variables are not provided the adapter falls back to
 hard‑coded placeholder data so the site can run locally without
-external services.
+external services. In production, checkout refuses to run without the
+SamCart variables rather than sending customers to a placeholder URL.
 
 ## License
 
