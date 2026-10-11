@@ -1,8 +1,8 @@
 import { catalog, productLines, variantId } from '../app/lib/catalog';
 
 describe('product catalog', () => {
-  test('has every product from the Edens Pharm sheet', () => {
-    expect(catalog).toHaveLength(35);
+  test('has every product from the Edens Pharm IFCR sheet', () => {
+    expect(catalog).toHaveLength(40);
   });
 
   test('slugs are unique and URL-safe', () => {

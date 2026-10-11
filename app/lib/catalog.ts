@@ -1,7 +1,7 @@
 /**
  * Eden's Pharm product catalog.
  *
- * Sourced from the "Edens Pharm" Google Sheet (one tab per product line).
+ * Sourced from the "Edens Pharm IFCR" Google Sheet (one tab per product line).
  * Each distinct formula is its own product page; flavors, blends and
  * formats that share a formula are variants on that page. Only
  * ingredient names are published here, never percentages or doses.
@@ -108,7 +108,7 @@ function fragrance(name: string, notes: string[]): CatalogProduct {
     name: `${name} Fragrance`,
     line: 'sanctus-una',
     description: `${name} is a Sanctus Unā signature fragrance with notes of ${listToText(
-      notes,
+      notes.length > 6 ? [...notes.slice(0, 5), 'more'] : notes,
     )}. Available as a tallow‑and‑beeswax solid perfume, a perfume oil, an attar or a spray.`,
     image: IMG.sanctus,
     optionName: 'Format',
@@ -234,37 +234,42 @@ export const catalog: CatalogProduct[] = [
   },
 
   // ── Sanctus Unā skincare ────────────────────────────────────────────────
-  skincare('face-balm-renew', 'Renew Face Balm', 'Our hero moisturizing facial balm: grass‑fed tallow with jojoba, squalane, sea buckthorn and rosehip oils, lightly scented with cedarwood, geranium, copaiba and lavender.', ['Grass-fed beef tallow', 'Jojoba oil', 'Squalane (olive-derived)', 'Sea buckthorn oil', 'Wheat germ oil', 'Rosehip oil', 'Oat oil', 'Arrowroot powder', 'Cedarwood, geranium, copaiba and lavender essential oils']),
-  skincare('healing-salve', 'Healing Salve', 'A soothing, protective salve of tallow, beeswax and calendula with lavender, tea tree and frankincense.', ['Beef tallow', 'Beeswax', 'Jojoba oil', 'Calendula oil', 'Wheat germ oil', 'Lavender, tea tree and frankincense essential oils']),
+  skincare('face-balm-renew', 'Renew Face Balm', 'Our hero moisturizing facial balm: grass‑fed tallow with jojoba, squalane, sea buckthorn and rosehip oils, lightly scented with cedarwood, geranium, copaiba and lavender.', ['Grass-fed beef tallow', 'Jojoba oil', 'Squalane (olive-derived)', 'Sea buckthorn oil', 'Vitamin E oil', 'Rosehip oil', 'Oat oil', 'Arrowroot powder', 'Cedarwood, geranium, copaiba and lavender essential oils']),
+  skincare('healing-salve', 'Healing Salve', 'A soothing, protective salve of tallow, beeswax and calendula with lavender, tea tree and frankincense.', ['Beef tallow', 'Beeswax', 'Jojoba oil', 'Calendula oil', 'Vitamin E oil', 'Lavender, tea tree and frankincense essential oils']),
   skincare('bar-soap', 'Sanctum Bar Soap', 'A cleansing tallow bar soap scented with our signature Sanctum blend.', ['Tallow', 'Coconut oil', 'Olive oil', 'Lye', 'Castor oil', 'Sanctum essential oil blend']),
-  skincare('body-butter', 'Sanctum Body Butter', 'Whipped tallow and shea body butter for full‑body hydration, scented with Sanctum.', ['Beef tallow', 'Shea butter', 'Jojoba oil', 'Arrowroot powder', 'Wheat germ oil', 'Sanctum essential oil blend']),
+  skincare('body-butter', 'Sanctum Body Butter', 'Whipped tallow and shea body butter for full‑body hydration, scented with Sanctum.', ['Beef tallow', 'Shea butter', 'Jojoba oil', 'Arrowroot powder', 'Vitamin E oil', 'Sanctum essential oil blend']),
   skincare('lotion-bar', 'Sanctum Lotion Bar', 'Portable, mess‑free hydration in a solid tallow and cocoa butter bar, scented with Sanctum.', ['Beef tallow', 'Beeswax', 'Cocoa butter', 'Jojoba oil', 'Sanctum essential oil blend']),
-  skincare('beard-butter', 'Beard Butter', 'Softens and conditions the beard with tallow, jojoba and mango butter, scented with Sanctum.', ['Beef tallow', 'Jojoba oil', 'Mango butter', 'Wheat germ oil', 'Sanctum essential oil blend']),
+  skincare('beard-butter', 'Beard Butter', 'Softens and conditions the beard with tallow, jojoba and mango butter, scented with Sanctum.', ['Beef tallow', 'Jojoba oil', 'Mango butter', 'Vitamin E oil', 'Sanctum essential oil blend']),
   skincare('shampoo-bar', 'Shampoo Bar', 'A gentle scalp‑cleansing bar made with yucca root and soapnut, scented with Sanctum.', ['Yucca root', 'Soapnut', 'Shea butter', 'Coconut oil', 'Oat oil', 'Amla powder', 'Sanctum essential oil blend']),
-  skincare('conditioner-bar', 'Conditioner Bar', 'Detangles and softens with shea butter, jojoba and oat oil, scented with Sanctum.', ['Beeswax', 'Lecithin', 'Shea butter', 'Jojoba oil', 'Wheat germ oil', 'Oat oil', 'Sanctum essential oil blend']),
-  skincare('baby-balm', 'Baby Balm', 'A gentle, unscented tallow and calendula balm for little ones.', ['Beef tallow', 'Calendula oil', 'Jojoba oil', 'Beeswax', 'Wheat germ oil']),
+  skincare('conditioner-bar', 'Conditioner Bar', 'Detangles and softens with shea butter, jojoba and oat oil, scented with Sanctum.', ['Beeswax', 'Lecithin', 'Shea butter', 'Jojoba oil', 'Vitamin E oil', 'Oat oil', 'Sanctum essential oil blend']),
+  skincare('baby-balm', 'Baby Balm', 'A gentle, unscented tallow and calendula balm for little ones.', ['Beef tallow', 'Calendula oil', 'Jojoba oil', 'Beeswax', 'Vitamin E oil']),
   skincare(
     'lip-balm',
     'Lip Balm',
     'Moisturizing tallow and beeswax lip balm in five flavors.',
-    ['Beef tallow', 'Beeswax', 'Wheat germ oil'],
+    ['Beef tallow', 'Beeswax', 'Vitamin E oil'],
     [
-      { label: 'Vanilla Macaroon', ingredients: ['Beef tallow', 'Beeswax', 'Sweet almond oil', 'Wheat germ oil', 'Vanilla extract powder'] },
-      { label: 'Bay Lime', ingredients: ['Beef tallow', 'Beeswax', 'Coconut oil', 'Wheat germ oil', 'Lime essential oil'] },
-      { label: 'Dreamsicle', ingredients: ['Beef tallow', 'Beeswax', 'Olive oil', 'Wheat germ oil', 'Vanilla extract powder', 'Orange essential oil'] },
-      { label: 'Unscented', ingredients: ['Beef tallow', 'Beeswax', 'Olive oil', 'Wheat germ oil'] },
-      { label: 'Caribbean Dream', ingredients: ['Beef tallow', 'Beeswax', 'Coconut oil', 'Wheat germ oil', 'Vanilla extract powder', 'Cinnamon bark, cardamom, nutmeg and clove essential oils'] },
+      { label: 'Vanilla Macaroon', ingredients: ['Beef tallow', 'Beeswax', 'Sweet almond oil', 'Vitamin E oil', 'Vanilla extract powder'] },
+      { label: 'Bay Lime', ingredients: ['Beef tallow', 'Beeswax', 'Coconut oil', 'Vitamin E oil', 'Lime essential oil'] },
+      { label: 'Dreamsicle', ingredients: ['Beef tallow', 'Beeswax', 'Olive oil', 'Vitamin E oil', 'Vanilla extract powder', 'Orange essential oil'] },
+      { label: 'Unscented', ingredients: ['Beef tallow', 'Beeswax', 'Olive oil', 'Vitamin E oil'] },
+      { label: 'Caribbean Dream', ingredients: ['Beef tallow', 'Beeswax', 'Coconut oil', 'Vitamin E oil', 'Vanilla extract powder', 'Cinnamon bark, cardamom, nutmeg and clove essential oils'] },
     ],
     'Flavor',
   ),
   skincare('deodorant-balm', 'Deodorant Balm', 'Natural odor control in a tallow balm with arrowroot, magnesium hydroxide and zinc ricinoleate, scented with Sanctum.', ['Beef tallow', 'Beeswax', 'Jojoba oil', 'Arrowroot powder', 'Magnesium hydroxide', 'Zinc ricinoleate', 'Colloidal silver', 'Sanctum essential oil blend']),
 
   // ── Sanctus Unā fragrance ───────────────────────────────────────────────
-  fragrance('Sanctum', ['Jasmine sambac', 'Ylang ylang', 'Cinnamon bark', 'Cardamom', 'Black currant', 'Atlas cedarwood', 'Vetiver', 'Vanilla', 'Peru balsam']),
+  fragrance('Sanctum', ['Jasmine sambac', 'Ylang ylang', 'Cinnamon bark', 'Cardamom', 'Black currant', 'Atlas cedarwood', 'Vetiver', 'Vanilla', 'Peru balsam', 'Labdanum', 'Benzoin', 'Frankincense sacra', 'Osmanthus', 'Tonka bean', 'Cypriol (nagarmotha)', 'Tolu balsam', 'Clary sage', 'Black pepper', 'White pepper', 'Saffron']),
   fragrance('Redeemed', ['Elderflower', 'Gardenia', 'Frankincense sacra', 'Cacao', 'Citron', 'Pomelo', 'Myrrh']),
   fragrance('Unbound', ['Honeysuckle', 'Texas cedarwood', 'Rose otto', 'Grapefruit', 'Yuzu', 'Balsam fir']),
   fragrance('Stoic', ['Amyris', 'Beeswax absolute', 'Rosewood', 'Vanilla', 'Violet', 'Hay', 'Orris', 'Tonka bean', 'Benzoin', 'Amber', 'Atlas cedarwood', 'Pink peppercorn']),
   fragrance('Tranquil', ['Violet leaf', 'Petitgrain bigarade', 'Basil', 'Bergamot', 'Bitter orange peel', 'Mandarin peel', 'Neroli', 'Jasmine grandiflorum', 'Cypress', 'Hinoki', 'Elemi', 'Frankincense frereana', 'Benzoin']),
+  fragrance('Clarity', ['Lemon', 'Pink pepper', 'French lavender', 'Neroli', 'Petitgrain bigarade', 'Virginia cedarwood', 'Patchouli', 'Benzoin', 'Vanilla']),
+  fragrance('Hearth', ['Bergamot', 'Pink peppercorn', 'Osmanthus', 'Davana', 'Orris', 'Clary sage', 'Jasmine sambac', 'Saffron', 'Labdanum', 'Guaiacwood', 'Benzoin', 'Cypriol (nagarmotha)', 'Vetiver', 'Hay', 'Tonka bean', 'Vanilla', 'Agarwood (oud)', 'Beeswax absolute', 'Cacao', 'Cade']),
+  fragrance('Solitude', ['Bergamot', 'Pink peppercorn', 'Black spruce', 'Helichrysum (immortelle)', 'Tolu balsam', 'Clary sage', 'Vanilla', 'Siam wood', 'Atlas cedarwood', 'Guaiacwood', 'Benzoin', 'Labdanum', 'Vetiver', 'Buddha wood', 'Ambrette seed', 'Cade']),
+  fragrance('Primal', ['Bergamot', 'Black pepper', 'Juniper berry', 'Coriander seed', 'Rosemary', 'Thyme', 'Ginger', 'Cardamom', 'Lovage', 'Celery seed', 'Curry leaf', 'Pimento berry', 'Bay laurel', 'Nutmeg', 'Cumin', 'Virginia cedarwood', 'Labdanum', 'Cypriol (nagarmotha)', 'Vetiver', 'Hay', 'Benzoin', 'Patchouli', 'Cade']),
+  fragrance('Sanguine', ['Mandarin', 'Bergamot', 'Pink peppercorn', 'Blackcurrant bud', 'Bulgarian rose', 'White lotus', 'Lilac', 'White ginger lily', 'Jasmine grandiflorum', 'Hyacinth', 'Tuberose', 'Neroli', 'Rose geranium', 'Violet leaf', 'Ylang ylang', 'Benzoin', 'Amyris', 'Ambrette seed', 'Champaca', 'Vanilla']),
 
   // ── Callalux ────────────────────────────────────────────────────────────
   {

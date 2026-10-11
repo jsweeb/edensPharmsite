@@ -40,7 +40,7 @@ test('home page product cards link to the catalog', async ({ page }) => {
 test('every product in the sitemap has a working page', async ({ page, request }) => {
   const sitemap = await (await request.get('/sitemap.xml')).text();
   const paths = Array.from(sitemap.matchAll(/<loc>[^<]*?(\/products\/[^<]+)<\/loc>/g), (m) => m[1]);
-  expect(paths.length).toBe(35);
+  expect(paths.length).toBe(40);
   for (const path of paths) {
     const res = await request.get(path);
     expect(res.status(), path).toBe(200);
