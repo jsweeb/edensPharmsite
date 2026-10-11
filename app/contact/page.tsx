@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import React from 'react';
+import ContactForm from '@/components/ContactForm';
+import { CONTACT_EMAIL } from '@/app/lib/site';
 
 export const metadata: Metadata = {
-  title: "Contact Us | Eden's Pharm",
+  title: "Contact Us",
   description:
     "Get in touch with the Eden's Pharm team for questions about products, orders or general inquiries.",
 };
@@ -11,10 +13,8 @@ export const metadata: Metadata = {
 /**
  * Contact page.
  *
- * Presents a simple contact form alongside company contact information.
- * The form does not submit to any backend but illustrates how users
- * might reach out. Accessibility considerations include labels for
- * inputs and focus styling.
+ * Presents a contact form alongside company contact information. The
+ * form hands off to the visitor's email client (see ContactForm).
  */
 export default function ContactPage() {
   return (
@@ -25,6 +25,7 @@ export default function ContactPage() {
           src="/images/sanctus.png"
           alt="White blossom on dark water"
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />
@@ -46,61 +47,18 @@ export default function ContactPage() {
           </p>
         </header>
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Contact form */}
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-            <div>
-              <label htmlFor="name" className="block mb-1 font-semibold">
-                Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                className="w-full bg-earth border border-highlight p-2 rounded text-sand"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block mb-1 font-semibold">
-                Email address
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                className="w-full bg-earth border border-highlight p-2 rounded text-sand"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="message" className="block mb-1 font-semibold">
-                Message
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                rows={5}
-                className="w-full bg-earth border border-highlight p-2 rounded text-sand"
-                required
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-accent text-earth rounded hover:bg-highlight"
-            >
-              Send Message
-            </button>
-          </form>
+          <ContactForm email={CONTACT_EMAIL} />
           {/* Contact details */}
           <div className="space-y-4">
             <h3 className="text-2xl font-semibold">Contact Information</h3>
             <p className="flex items-center space-x-2">
-              <i className="fas fa-phone-alt" aria-hidden="true"></i>
-              <span>Phone: (555) 123‑4567</span>
-            </p>
-            <p className="flex items-center space-x-2">
               <i className="fas fa-envelope" aria-hidden="true"></i>
-              <span>Email: info@edenspharm.com</span>
+              <span>
+                Email:{' '}
+                <a href={`mailto:${CONTACT_EMAIL}`} className="underline text-accent">
+                  {CONTACT_EMAIL}
+                </a>
+              </span>
             </p>
             <p className="flex items-center space-x-2">
               <i className="fas fa-map-marker-alt" aria-hidden="true"></i>

@@ -11,12 +11,13 @@ import { getInventory } from '@/app/lib/vineyard';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { variantId: string } },
+  { params }: { params: Promise<{ variantId: string }> },
 ) {
+  const { variantId } = await params;
   try {
-    const info = await getInventory(params.variantId);
-    return NextResponse.json(info);
-  } catch (err: any) {
+    const info = await getInventory(variantId);
+    return NextResponse.json(info, { headers: { 'Cache-Control': 'no-store' } });
+  } catch (err) {
     console.error(err);
     return NextResponse.json(
       { error: 'Failed to fetch inventory' },

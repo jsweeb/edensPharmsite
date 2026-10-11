@@ -1,34 +1,57 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Happy path end‑to‑end test.
+ * Happy path end‑to‑end tests.
  *
- * This test runs against a running Next.js development or production
- * server. It exercises the basic flow of browsing products, viewing a
- * product detail page, adding a variant to the cart and navigating to
- * checkout. In CI the server should be started before the test runs.
+ * These run against the production server started by playwright.config.ts
+ * (run `npm run build` first). They exercise browsing products, adding a
+ * variant to the cart and reaching checkout, plus a few launch smoke checks.
  */
 test('user can browse products and initiate checkout', async ({ page }) => {
-  // Navigate to the home page
   await page.goto('/');
-  // Click the Products link in the navigation
-  await page.getByRole('link', { name: 'Products' }).click();
+  await page.getByRole('navigation').getByRole('link', { name: 'Products' }).click();
   await expect(page).toHaveURL(/\/products$/);
 
-  // Click the first product card's View Details button
-  const viewLinks = await page.locator('text=View Details').all();
-  await viewLinks[0].click();
-  await expect(page).toHaveURL(/\/products\//);
+  await page.getByRole('link', { name: 'View Details' }).first().click();
+  await expect(page).toHaveURL(/\/products\/[^/]+$/);
 
-  // Wait for the stock message to load
-  await page.getByTestId('stock-message').waitFor({ state: 'attached' });
-  // Add the default variant to the cart
+  await expect(page.getByTestId('stock-message')).not.toHaveText('Loading…');
   await page.getByRole('button', { name: /Add to Cart|Pre‑Order/ }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Added to your cart' })).toBeVisible();
 
-  // Navigate directly to the checkout page
-  await page.goto('/checkout');
-  if (await page.locator('text=Your cart is empty').count() === 0) {
-    // The cart contains items; checkout button should be visible
-    await expect(page.getByRole('button', { name: 'Proceed to Checkout' })).toBeVisible();
-  }
+  await page.getByRole('link', { name: /View cart & checkout/ }).click();
+  await expect(page).toHaveURL(/\/checkout$/);
+  await expect(page.getByText('Your cart is empty')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Proceed to Checkout' })).toBeVisible();
+});
+
+test('home page product cards link to their product pages', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Shop Elation' }).click();
+  await expect(page).toHaveURL(/\/products\/elation$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Elation' })).toBeVisible();
+});
+
+test('unknown product returns 404', async ({ page }) => {
+  const res = await page.goto('/products/does-not-exist');
+  expect(res?.status()).toBe(404);
+  await expect(page.getByRole('heading', { name: 'Page Not Found' })).toBeVisible();
+});
+
+test('About menu opens with the keyboard', async ({ page }) => {
+  await page.goto('/');
+  const about = page.getByRole('button', { name: 'About' });
+  await about.focus();
+  await page.keyboard.press('Enter');
+  await expect(about).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByRole('link', { name: 'Mission & Values' })).toBeVisible();
+});
+
+test('mobile menu toggles navigation links', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto('/');
+  await expect(page.getByRole('link', { name: 'Blog' })).toBeHidden();
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.getByRole('link', { name: 'Blog' }).click();
+  await expect(page).toHaveURL(/\/blog$/);
 });

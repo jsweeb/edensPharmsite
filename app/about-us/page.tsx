@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 
 export const metadata: Metadata = {
-  title: "About Us | Eden's Pharm",
+  title: "About Us",
   description:
     "Learn about the origins of Eden's Pharm, our mission to restore wellness through clean formulations, and the values that guide our craft.",
 };
@@ -26,6 +26,7 @@ export default function AboutUsPage() {
           src="/images/banner.png"
           alt="Eden's Pharm hero banner with flower reflection"
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />
@@ -73,7 +74,7 @@ export default function AboutUsPage() {
         </p>
         <p className="leading-relaxed">
           So I created our own: <strong>Benedulce™</strong>, a clean, functional
-          sweetener with a 1:1 sugar replacement ratio—powered by alulose,
+          sweetener with a 1:1 sugar replacement ratio—powered by allulose,
           monk fruit, erythritol, xylitol and collagen.
         </p>
         <p className="leading-relaxed">

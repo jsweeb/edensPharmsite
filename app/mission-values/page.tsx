@@ -3,7 +3,7 @@ import Image from 'next/image';
 import React from 'react';
 
 export const metadata: Metadata = {
-  title: "Mission & Values | Eden's Pharm",
+  title: "Mission & Values",
   description:
     "Explore the mission and core values that guide Eden's Pharm in crafting transparent, purpose‑driven wellness products.",
 };
@@ -23,6 +23,7 @@ export default function MissionValuesPage() {
           src="/images/banner.png"
           alt="Eden's Pharm banner with flower reflection"
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />

@@ -4,8 +4,8 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import React from 'react';
 
-interface Params {
-  slug: string;
+interface Props {
+  params: Promise<{ slug: string }>;
 }
 
 /**
@@ -21,15 +21,16 @@ export async function generateStaticParams() {
  * Provide per-page metadata based on the post content. Falls back
  * gracefully if a post cannot be found.
  */
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const post = getBlogPost(params.slug);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const post = getBlogPost(slug);
   if (!post) {
     return {
       title: "Post Not Found",
     };
   }
   return {
-    title: `${post.title} | Eden's Pharm`,
+    title: post.title,
     description: post.excerpt,
     openGraph: {
       title: post.title,
@@ -37,8 +38,6 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       images: [
         {
           url: post.image,
-          width: 1200,
-          height: 630,
           alt: post.title,
         },
       ],
@@ -46,8 +45,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   };
 }
 
-export default async function BlogPostPage({ params }: { params: Params }) {
-  const post = getBlogPost(params.slug);
+export const dynamicParams = false;
+
+export default async function BlogPostPage({ params }: Props) {
+  const { slug } = await params;
+  const post = getBlogPost(slug);
   if (!post) {
     notFound();
   }
@@ -56,21 +58,21 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       {/* Hero */}
       <section className="relative h-64 w-full overflow-hidden rounded">
         <Image
-          src={post!.image}
-          alt={post!.title}
+          src={post.image}
+          alt={post.title}
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
           <h1 className="text-4xl md:text-5xl font-cursive text-sand drop-shadow-lg text-center px-4">
-            {post!.title}
+            {post.title}
           </h1>
         </div>
       </section>
       <section className="max-w-3xl mx-auto space-y-4 leading-relaxed">
-        {/* eslint-disable-next-line react/no-danger */}
-        <div dangerouslySetInnerHTML={{ __html: markdownToHtml(post!.content) }} />
+        <div dangerouslySetInnerHTML={{ __html: markdownToHtml(post.content) }} />
       </section>
     </article>
   );

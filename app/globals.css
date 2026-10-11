@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Google Fonts for Lato and Alex Brush.  Note: fonts are loaded via external link in the document metadata. */
-@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Lato:ital,wght@1,500&display=swap');
+/* Lato and Alex Brush are loaded via a <link> in app/layout.tsx. */
 
 /* Custom focus ring for accessibility */
 :focus-visible {

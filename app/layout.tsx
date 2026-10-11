@@ -3,8 +3,10 @@ import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
 import React from 'react';
+import { SITE_URL } from '@/app/lib/site';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Eden's Pharm",
     template: "%s | Eden's Pharm",
@@ -15,13 +17,11 @@ export const metadata: Metadata = {
     title: "Eden's Pharm",
     description:
       "Discover wellness products crafted with purpose, grounded in truth and designed for healing from within.",
-    url: "https://example.com",
+    url: SITE_URL,
     siteName: "Eden's Pharm",
     images: [
       {
-        url: "/images/edens-pharm-hero-banner.png",
-        width: 1200,
-        height: 630,
+        url: "/images/banner.png",
         alt: "Eden's Pharm hero banner",
       },
     ],
@@ -35,6 +35,7 @@ export const metadata: Metadata = {
       "Discover wellness products crafted with purpose, grounded in truth and designed for healing from within.",
     site: '@edenspharm',
     creator: '@edenspharm',
+    images: ['/images/banner.png'],
   },
 };
 
@@ -46,11 +47,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta charSet="utf-8" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no"
-        />
         {/* Google Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

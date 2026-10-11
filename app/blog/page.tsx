@@ -5,7 +5,7 @@ import { listBlogPosts } from '@/app/lib/blog';
 import React from 'react';
 
 export const metadata: Metadata = {
-  title: "Blog | Eden's Pharm",
+  title: "Blog",
   description:
     "Explore stories behind our products, deep dives into our ingredients and musings on wellness.",
 };
@@ -25,6 +25,7 @@ export default async function BlogPage() {
           src="/images/banner.png"
           alt="Eden's Pharm blog banner"
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />
@@ -57,6 +58,7 @@ export default async function BlogPage() {
                     src={post.image}
                     alt={post.title}
                     fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
                     className="object-cover"
                   />
                 </div>
@@ -65,7 +67,7 @@ export default async function BlogPage() {
                   <p className="text-sm flex-1 mb-4">{post.excerpt}</p>
                   <Link
                     href={`/blog/${post.slug}`}
-                    className="mt-auto inline-block px-3 py-2 bg-accent text-earth rounded hover:bg-highlight"
+                    className="mt-auto inline-block px-3 py-2 bg-accent text-earth rounded hover:bg-highlight hover:text-white"
                   >
                     Read More
                   </Link>
