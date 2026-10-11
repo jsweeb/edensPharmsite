@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getProduct } from '@/app/lib/vineyard';
+import { getInventory, getProduct } from '@/app/lib/vineyard';
 import ProductVariantSelector from '@/components/ProductVariantSelector';
 
 interface Props {
@@ -45,6 +45,15 @@ export default async function ProductPage({ params }: Props) {
     notFound();
   }
   const optionName = product.optionName ?? 'Variant';
+  // Mark which options can be bought so the picker can label the rest and
+  // open on an in-stock option. Live stock is still re-checked client-side.
+  const variants = await Promise.all(
+    product.variants.map(async ({ id, label, preorderAllowed }) => {
+      const inv = await getInventory(id).catch(() => null);
+      const inStock = !!inv && (inv.availableQty > 0 || inv.preorderAllowed);
+      return { id, label, preorderAllowed, inStock };
+    }),
+  );
   const variantsWithIngredients = product.variants.filter((v) => v.ingredients?.length);
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -63,7 +72,7 @@ export default async function ProductPage({ params }: Props) {
       <div>
         <h2 className="text-xl font-bold mb-2">Select {optionName}</h2>
         <ProductVariantSelector
-          variants={product.variants.map(({ id, label, preorderAllowed }) => ({ id, label, preorderAllowed }))}
+          variants={variants}
           optionName={optionName}
         />
       </div>

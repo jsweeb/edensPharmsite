@@ -23,4 +23,33 @@ describe('product catalog', () => {
     const ids = catalog.flatMap((p) => p.variants.map((v) => variantId(p.slug, v.label)));
     expect(new Set(ids).size).toBe(ids.length);
   });
+
+  test('only the launch lineup is in stock', () => {
+    const inStock = catalog.flatMap((p) => p.variants.filter((v) => v.available).map((v) => `${p.name}: ${v.label}`));
+    const sprays = ['EDC', 'EDT', 'EDP', 'Parfum', 'Extract'];
+    expect(inStock.sort()).toEqual(
+      [
+        'Hydrasal: Raw',
+        'Sanctum Fragrance: Solid – Extract',
+        'Redeemed Fragrance: Solid – Extract',
+        'Unbound Fragrance: Solid – Extract',
+        ...sprays.map((c) => `Redeemed Fragrance: Spray – ${c}`),
+        ...sprays.map((c) => `Unbound Fragrance: Spray – ${c}`),
+      ].sort(),
+    );
+  });
+
+  test('fragrances offer solid EDT/EDP/Extract and spray EDC/EDT/EDP/Parfum/Extract', () => {
+    const sanctum = catalog.find((p) => p.slug === 'sanctus-una-sanctum-fragrance')!;
+    expect(sanctum.variants.map((v) => v.label)).toEqual([
+      'Solid – EDT',
+      'Solid – EDP',
+      'Solid – Extract',
+      'Spray – EDC',
+      'Spray – EDT',
+      'Spray – EDP',
+      'Spray – Parfum',
+      'Spray – Extract',
+    ]);
+  });
 });

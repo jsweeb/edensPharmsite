@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { addToCart, CartFullError, MAX_QTY } from '@/app/lib/cart';
+import { getInventory } from '@/app/lib/vineyard';
 
 /**
  * API handler for cart operations. Currently supports POST to add
@@ -24,6 +25,17 @@ export async function POST(request: NextRequest) {
     (qty as number) > MAX_QTY
   ) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+  }
+  // Never let an out-of-stock (or unknown) variant into the cart, even if
+  // the client bypasses the disabled button.
+  try {
+    const inv = await getInventory(variantId);
+    if (inv.availableQty <= 0 && !inv.preorderAllowed) {
+      return NextResponse.json({ error: 'This item is out of stock', code: 'out_of_stock' }, { status: 409 });
+    }
+  } catch (err) {
+    console.error('Failed to check stock', err);
+    return NextResponse.json({ error: 'Could not check stock' }, { status: 503 });
   }
   try {
     const cart = await addToCart(variantId, qty as number);

@@ -25,4 +25,14 @@ describe('Vineyard adapter fallback', () => {
     expect(inv).toHaveProperty('availableQty');
     expect(typeof inv.availableQty).toBe('number');
   });
+
+  test('defaults to out of stock except the launch lineup', async () => {
+    expect((await getInventory('hydrasal--raw')).availableQty).toBeGreaterThan(0);
+    expect((await getInventory('sanctus-una-sanctum-fragrance--solid-extract')).availableQty).toBeGreaterThan(0);
+    expect((await getInventory('sanctus-una-sanctum-fragrance--spray-edp')).availableQty).toBe(0);
+    expect((await getInventory('sanctus-una-unbound-fragrance--solid-edt')).availableQty).toBe(0);
+    expect((await getInventory('hydrasal--strawberry')).availableQty).toBe(0);
+    expect((await getInventory('elation-energy--standard')).availableQty).toBe(0);
+    expect((await getInventory('not-a-real-variant')).availableQty).toBe(0);
+  });
 });

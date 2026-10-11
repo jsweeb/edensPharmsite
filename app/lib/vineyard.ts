@@ -128,10 +128,21 @@ export interface InventoryInfo {
   preorderAllowed: boolean;
 }
 
+// Placeholder quantity for in-stock launch variants without Vineyard.
+const FALLBACK_STOCK = 99;
+const launchVariantIds = new Set(
+  catalog.flatMap((p) => p.variants.filter((v) => v.available).map((v) => variantId(p.slug, v.label))),
+);
+
+function isLaunchVariant(id: string): boolean {
+  return launchVariantIds.has(id);
+}
+
 export async function getInventory(id: string): Promise<InventoryInfo> {
   if (!BASE_URL || !API_KEY) {
-    // Placeholder stock for local development until Vineyard is connected.
-    return { availableQty: 5, preorderAllowed: false };
+    // Until Vineyard is connected, only the launch lineup flagged
+    // `available` in the catalog is in stock; everything else is out of stock.
+    return { availableQty: isLaunchVariant(id) ? FALLBACK_STOCK : 0, preorderAllowed: false };
   }
   // Live stock must never be served from the fetch cache.
   return await fetchWithRetry<InventoryInfo>(`/inventory/${encodeURIComponent(id)}`, {

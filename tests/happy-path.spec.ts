@@ -73,3 +73,31 @@ test('mobile menu toggles navigation links', async ({ page }) => {
   await page.getByRole('link', { name: 'Blog' }).click();
   await expect(page).toHaveURL(/\/blog$/);
 });
+
+test('only the launch lineup can be bought', async ({ page, request }) => {
+  // Sanctum opens on its in-stock option and labels the rest.
+  await page.goto('/products/sanctus-una-sanctum-fragrance');
+  const format = page.getByLabel('Format');
+  await expect(format).toHaveValue('sanctus-una-sanctum-fragrance--solid-extract');
+  await expect(format.locator('option', { hasText: 'Solid – EDT (Out of Stock)' })).toHaveCount(1);
+  await expect(page.getByTestId('stock-message')).toHaveText('In Stock');
+
+  await format.selectOption('sanctus-una-sanctum-fragrance--spray-edp');
+  await expect(page.getByTestId('stock-message')).toHaveText('Out of Stock');
+  await expect(page.getByRole('button', { name: 'Add to Cart' })).toBeDisabled();
+
+  // Unbound sprays are available.
+  await page.goto('/products/sanctus-una-unbound-fragrance');
+  await page.getByLabel('Format').selectOption('sanctus-una-unbound-fragrance--spray-parfum');
+  await expect(page.getByTestId('stock-message')).toHaveText('In Stock');
+
+  // Everything else defaults to out of stock.
+  await page.goto('/products/elation-energy');
+  await expect(page.getByTestId('stock-message')).toHaveText('Out of Stock');
+  await expect(page.getByRole('button', { name: 'Add to Cart' })).toBeDisabled();
+
+  // The server refuses out-of-stock items even if the button is bypassed.
+  const res = await request.post('/api/cart', { data: { variantId: 'elation-energy--standard', qty: 1 } });
+  expect(res.status()).toBe(409);
+  expect((await res.json()).code).toBe('out_of_stock');
+});
