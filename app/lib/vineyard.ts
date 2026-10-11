@@ -139,21 +139,26 @@ export async function getInventory(id: string): Promise<InventoryInfo> {
   });
 }
 
-// Create an order with payload. Returns order id or details.
-export async function createOrder(payload: unknown): Promise<unknown> {
+// Create an order with payload. Returns order id or details. Pass an
+// idempotency key so a redelivered webhook can't create a duplicate order.
+export async function createOrder(payload: unknown, idempotencyKey?: string): Promise<unknown> {
   return await fetchWithRetry('/orders', {
     method: 'POST',
     body: JSON.stringify(payload),
+    headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : undefined,
   });
 }
 
-// Update inventory for a variant. Delta can be negative.
+// Update inventory for a variant. Delta can be negative. Pass an idempotency
+// key so a redelivered webhook can't apply the same decrement twice.
 export async function updateInventory(
   variantId: string,
   delta: number,
+  idempotencyKey?: string,
 ): Promise<unknown> {
   return await fetchWithRetry(`/inventory/${encodeURIComponent(variantId)}`, {
     method: 'PATCH',
     body: JSON.stringify({ delta }),
+    headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : undefined,
   });
 }

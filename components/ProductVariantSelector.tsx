@@ -22,7 +22,7 @@ interface Props {
 
 const MAX_QTY = 99;
 
-type CartStatus = 'idle' | 'adding' | 'added' | 'error';
+type CartStatus = 'idle' | 'adding' | 'added' | 'full' | 'error';
 
 export default function ProductVariantSelector({ variants, optionName = 'Variant' }: Props) {
   const [selectedId, setSelectedId] = useState(variants[0]?.id ?? '');
@@ -60,6 +60,10 @@ export default function ProductVariantSelector({ variants, optionName = 'Variant
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ variantId: selectedId, qty }),
       });
+      if (res.status === 409) {
+        setCartStatus('full');
+        return;
+      }
       if (!res.ok) throw new Error(`Cart request failed: ${res.status}`);
       setCartStatus('added');
     } catch (err) {
@@ -147,6 +151,15 @@ export default function ProductVariantSelector({ variants, optionName = 'Variant
             <Link href="/checkout" className="underline text-accent">
               View cart &amp; checkout
             </Link>
+          </>
+        )}
+        {cartStatus === 'full' && (
+          <>
+            Your cart is full. Please{' '}
+            <Link href="/checkout" className="underline text-accent">
+              check out or remove an item
+            </Link>{' '}
+            first.
           </>
         )}
         {cartStatus === 'error' && 'Sorry, we couldn’t add that to your cart. Please try again.'}

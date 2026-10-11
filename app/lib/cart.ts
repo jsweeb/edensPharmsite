@@ -13,7 +13,14 @@ export interface CartItem {
 
 const CART_COOKIE = 'cart';
 export const MAX_QTY = 99;
-const MAX_LINES = 20;
+export const MAX_LINES = 20;
+
+/** Thrown when adding a new line would exceed MAX_LINES. */
+export class CartFullError extends Error {
+  constructor() {
+    super(`Cart can hold at most ${MAX_LINES} different items`);
+  }
+}
 
 function isValidItem(item: unknown): item is CartItem {
   if (!item || typeof item !== 'object') return false;
@@ -67,8 +74,9 @@ async function saveCart(cart: CartItem[]): Promise<void> {
 
 /**
  * Add an item to the cart or update its quantity if it already exists.
- * Quantities are capped at MAX_QTY per line. Returns the updated cart
- * contents. Must be called from a route handler or server action.
+ * Quantities are capped at MAX_QTY per line. Throws CartFullError if the
+ * cart already has MAX_LINES lines. Returns the updated cart contents.
+ * Must be called from a route handler or server action.
  */
 export async function addToCart(variantId: string, qty: number): Promise<CartItem[]> {
   const current = await getCart();
@@ -77,6 +85,8 @@ export async function addToCart(variantId: string, qty: number): Promise<CartIte
     current[index].qty = Math.min(current[index].qty + qty, MAX_QTY);
   } else if (current.length < MAX_LINES) {
     current.push({ variantId, qty: Math.min(qty, MAX_QTY) });
+  } else {
+    throw new CartFullError();
   }
   await saveCart(current);
   return current;

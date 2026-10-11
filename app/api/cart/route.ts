@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addToCart, MAX_QTY } from '@/app/lib/cart';
+import { addToCart, CartFullError, MAX_QTY } from '@/app/lib/cart';
 
 /**
  * API handler for cart operations. Currently supports POST to add
@@ -29,6 +29,9 @@ export async function POST(request: NextRequest) {
     const cart = await addToCart(variantId, qty as number);
     return NextResponse.json({ cart });
   } catch (err) {
+    if (err instanceof CartFullError) {
+      return NextResponse.json({ error: err.message, code: 'cart_full' }, { status: 409 });
+    }
     console.error('Failed to update cart', err);
     return NextResponse.json({ error: 'Failed to update cart' }, { status: 500 });
   }

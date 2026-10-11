@@ -10,7 +10,24 @@ import { createOrder, updateInventory } from '@/app/lib/vineyard';
  * handler creates a corresponding order in Vineyard and decrements
  * inventory for each purchased variant. Responses must return 200 to
  * acknowledge receipt.
+ *
+ * SamCart redelivers any event that doesn't get a 200, so every side effect
+ * is idempotent: each Vineyard call carries an Idempotency-Key derived from
+ * the order id, and steps that already succeeded are remembered so a retry
+ * after a partial failure only re-runs what failed.
  */
+
+// Completed side effects, keyed by idempotency key. In-process only; the
+// Idempotency-Key header lets Vineyard dedupe across restarts.
+const completedSteps = new Set<string>();
+const MAX_REMEMBERED_STEPS = 10_000;
+
+async function once(key: string, step: () => Promise<unknown>): Promise<void> {
+  if (completedSteps.has(key)) return;
+  await step();
+  if (completedSteps.size >= MAX_REMEMBERED_STEPS) completedSteps.clear();
+  completedSteps.add(key);
+}
 
 interface LineItem {
   variantId: string;
@@ -39,15 +56,21 @@ export async function POST(req: NextRequest) {
     return new NextResponse('ignored', { status: 200 });
   }
   const data = event.data ?? {};
+  const orderId = data.orderId;
+  if ((typeof orderId !== 'string' && typeof orderId !== 'number') || String(orderId).length === 0) {
+    return new NextResponse('Missing orderId', { status: 400 });
+  }
   // Accept either a list of items or a single variantId/qty pair.
   const items: unknown[] = Array.isArray(data.items) ? data.items : [data];
   if (items.length === 0 || !items.every(isLineItem)) {
     return new NextResponse('Missing or invalid line items', { status: 400 });
   }
   try {
-    await createOrder(data);
+    const orderKey = `samcart-order-${orderId}`;
+    await once(orderKey, () => createOrder(data, orderKey));
     for (const item of items as LineItem[]) {
-      await updateInventory(item.variantId, -item.qty);
+      const itemKey = `${orderKey}-inventory-${item.variantId}`;
+      await once(itemKey, () => updateInventory(item.variantId, -item.qty, itemKey));
     }
     return new NextResponse('ok', { status: 200 });
   } catch (err) {
