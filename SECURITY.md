@@ -24,8 +24,8 @@ advisories are caught even without code changes.
 | Surface | Controls | Regression tests |
 | --- | --- | --- |
 | `app/api/samcart/webhook/route.ts` | Shared-secret header checked with a constant-time comparison; malformed JSON, missing `orderId` and invalid line items are rejected; order creation and inventory updates are idempotent (an `Idempotency-Key` for each step, and completed steps are remembered) so redeliveries can't duplicate orders or double-decrement stock | `__tests__/samcart-webhook.test.ts` |
-| `app/checkout/page.tsx` (server actions) | Reads only the validated cart; refuses placeholder checkout URLs in production; redirects only to the URL SamCart returns | `tests/happy-path.spec.ts` |
-| `app/api/cart/route.ts`, `app/lib/cart.ts` | The cart cookie is `httpOnly`, `sameSite=lax` and `secure` in production; tampered cookies are filtered (type, length, integer quantity 1–99, at most 20 lines) | `__tests__/cart.test.ts` |
+| `app/checkout/page.tsx` (server actions) | Re-checks stock for every cart line before creating the SamCart session (`reconcileCart`): out-of-stock lines are dropped, quantities above stock are trimmed, and the shopper reviews the updated cart; a failed stock check fails closed. Refuses placeholder checkout URLs in production and redirects only to the URL SamCart returns | `__tests__/stock.test.ts`, `tests/happy-path.spec.ts` |
+| `app/api/cart/route.ts`, `app/lib/cart.ts`, `app/lib/stock.ts` | The cart cookie is `httpOnly`, `sameSite=lax` and `secure` in production; tampered cookies are filtered (type, length, integer quantity 1–99, at most 20 lines). Adds are checked server-side against stock: unknown or out-of-stock variants and quantities beyond available stock are rejected (409) | `__tests__/cart.test.ts`, `__tests__/stock.test.ts`, `tests/happy-path.spec.ts` |
 | Secrets | `VINEYARD_*` and `SAMCART_*` are server-only (no `NEXT_PUBLIC_` prefix) and `.env*` files are gitignored | Secret scan |
 
 ## Known follow-ups

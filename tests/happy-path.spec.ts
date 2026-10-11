@@ -73,3 +73,54 @@ test('mobile menu toggles navigation links', async ({ page }) => {
   await page.getByRole('link', { name: 'Blog' }).click();
   await expect(page).toHaveURL(/\/blog$/);
 });
+
+test('only the launch lineup can be bought', async ({ page, request }) => {
+  // Sanctum opens on its in-stock option and labels the rest.
+  await page.goto('/products/sanctus-una-sanctum-fragrance');
+  const format = page.getByLabel('Format');
+  await expect(format).toHaveValue('sanctus-una-sanctum-fragrance--solid-extract');
+  await expect(format.locator('option', { hasText: 'Solid – EDT (Out of Stock)' })).toHaveCount(1);
+  await expect(page.getByTestId('stock-message')).toHaveText('In Stock');
+
+  await format.selectOption('sanctus-una-sanctum-fragrance--spray-edp');
+  await expect(page.getByTestId('stock-message')).toHaveText('Out of Stock');
+  await expect(page.getByRole('button', { name: 'Add to Cart' })).toBeDisabled();
+
+  // Unbound solids and sprays are available in every concentration.
+  await page.goto('/products/sanctus-una-unbound-fragrance');
+  await expect(page.getByLabel('Format')).toHaveValue('sanctus-una-unbound-fragrance--solid-edt');
+  await expect(page.getByTestId('stock-message')).toHaveText('In Stock');
+  await page.getByLabel('Format').selectOption('sanctus-una-unbound-fragrance--spray-parfum');
+  await expect(page.getByTestId('stock-message')).toHaveText('In Stock');
+
+  // Everything else defaults to out of stock.
+  await page.goto('/products/elation-energy');
+  await expect(page.getByTestId('stock-message')).toHaveText('Out of Stock');
+  await expect(page.getByRole('button', { name: 'Add to Cart' })).toBeDisabled();
+
+  // The server refuses out-of-stock items even if the button is bypassed.
+  const res = await request.post('/api/cart', { data: { variantId: 'elation-energy--standard', qty: 1 } });
+  expect(res.status()).toBe(409);
+  expect((await res.json()).code).toBe('out_of_stock');
+});
+
+test('checkout drops cart lines that are no longer in stock', async ({ page, context, baseURL }) => {
+  // Simulate a cart saved before the launch lineup: one valid line, one now
+  // out of stock.
+  await context.addCookies([
+    {
+      name: 'cart',
+      value: JSON.stringify([
+        { variantId: 'hydrasal--raw', qty: 1 },
+        { variantId: 'elation-energy--standard', qty: 1 },
+      ]),
+      url: baseURL!,
+    },
+  ]);
+  await page.goto('/checkout');
+  await page.getByRole('button', { name: 'Proceed to Checkout' }).click();
+  await expect(page).toHaveURL(/\/checkout\?stock=1$/);
+  await expect(page.getByRole('alert').filter({ hasText: 'updated your cart' })).toBeVisible();
+  await expect(page.getByText('Hydrasal — Raw')).toBeVisible();
+  await expect(page.getByText('Elation Energy')).toHaveCount(0);
+});

@@ -7,6 +7,8 @@ interface Variant {
   id: string;
   label: string;
   preorderAllowed: boolean;
+  /** Server-side stock snapshot, used to label options and pick the default. */
+  inStock?: boolean;
 }
 
 interface InventoryInfo {
@@ -22,15 +24,18 @@ interface Props {
 
 const MAX_QTY = 99;
 
-type CartStatus = 'idle' | 'adding' | 'added' | 'full' | 'error';
+type CartStatus = 'idle' | 'adding' | 'added' | 'full' | 'out_of_stock' | 'insufficient_stock' | 'error';
 
 export default function ProductVariantSelector({ variants, optionName = 'Variant' }: Props) {
-  const [selectedId, setSelectedId] = useState(variants[0]?.id ?? '');
+  const [selectedId, setSelectedId] = useState(
+    (variants.find((v) => v.inStock) ?? variants[0])?.id ?? '',
+  );
   // Inventory results are tagged with the variant they belong to so a stale
   // response is never shown for a newly selected variant.
   const [result, setResult] = useState<{ variantId: string; info: InventoryInfo | null } | null>(null);
   const [qty, setQty] = useState(1);
   const [cartStatus, setCartStatus] = useState<CartStatus>('idle');
+  const [availableToAdd, setAvailableToAdd] = useState(0);
 
   useEffect(() => {
     if (!selectedId) return;
@@ -61,7 +66,11 @@ export default function ProductVariantSelector({ variants, optionName = 'Variant
         body: JSON.stringify({ variantId: selectedId, qty }),
       });
       if (res.status === 409) {
-        setCartStatus('full');
+        const body = await res.json().catch(() => ({}));
+        setCartStatus(
+          body.code === 'out_of_stock' || body.code === 'insufficient_stock' ? body.code : 'full',
+        );
+        if (body.code === 'insufficient_stock') setAvailableToAdd(body.available ?? 0);
         return;
       }
       if (!res.ok) throw new Error(`Cart request failed: ${res.status}`);
@@ -81,7 +90,7 @@ export default function ProductVariantSelector({ variants, optionName = 'Variant
     stockMessage = 'Stock information unavailable';
   } else if (inventory) {
     if (inventory.availableQty > 0) {
-      stockMessage = `In Stock (${inventory.availableQty})`;
+      stockMessage = inventory.availableQty <= 5 ? `Only ${inventory.availableQty} left` : 'In Stock';
     } else if (inventory.preorderAllowed) {
       stockMessage = 'Pre‑Order Available';
     } else {
@@ -108,7 +117,7 @@ export default function ProductVariantSelector({ variants, optionName = 'Variant
         >
           {variants.map((v) => (
             <option key={v.id} value={v.id}>
-              {v.label}
+              {v.inStock === false ? `${v.label} (Out of Stock)` : v.label}
             </option>
           ))}
         </select>
@@ -162,6 +171,11 @@ export default function ProductVariantSelector({ variants, optionName = 'Variant
             first.
           </>
         )}
+        {cartStatus === 'out_of_stock' && 'Sorry, that option just went out of stock.'}
+        {cartStatus === 'insufficient_stock' &&
+          (availableToAdd > 0
+            ? `Only ${availableToAdd} more available. Please lower the quantity.`
+            : 'You already have all available stock of this option in your cart.')}
         {cartStatus === 'error' && 'Sorry, we couldn’t add that to your cart. Please try again.'}
       </p>
     </div>

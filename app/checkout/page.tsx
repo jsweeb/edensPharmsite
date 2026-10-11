@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { getCart, clearCart, removeFromCart } from '@/app/lib/cart';
+import { getCart, clearCart, removeFromCart, saveCart } from '@/app/lib/cart';
+import { reconcileCart } from '@/app/lib/stock';
 import { createCheckoutSession } from '@/app/lib/samcart';
 import { listProducts, getProduct } from '@/app/lib/vineyard';
 import { revalidatePath } from 'next/cache';
@@ -14,16 +15,29 @@ export const metadata: Metadata = {
 };
 
 /**
- * Server action to process checkout. Reads the current cart, sends every
- * line to SamCart to create a session and then redirects the user to the
- * SamCart URL. If the cart is empty, it simply returns.
+ * Server action to process checkout. Re-checks stock for every line (the
+ * cart cookie can be up to 30 days old), then sends the cart to SamCart to
+ * create a session and redirects the user to the SamCart URL. If stock
+ * changed, the cart is updated and the shopper is sent back to review it.
  */
 async function processCheckout() {
   'use server';
-  const cart = await getCart();
-  if (cart.length === 0) {
+  const current = await getCart();
+  if (current.length === 0) {
     return;
   }
+  let reconciled: Awaited<ReturnType<typeof reconcileCart>>;
+  try {
+    reconciled = await reconcileCart(current);
+  } catch (err) {
+    console.error('Stock check failed', err);
+    redirect('/checkout?error=1');
+  }
+  if (reconciled.changed) {
+    await saveCart(reconciled.cart);
+    redirect('/checkout?stock=1');
+  }
+  const cart = reconciled.cart;
   let url: string | undefined;
   try {
     const session = await createCheckoutSession({ items: cart });
@@ -74,15 +88,21 @@ async function getVariantLabels(): Promise<Map<string, string>> {
 export default async function CheckoutPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; stock?: string }>;
 }) {
-  const [cart, labels, { error }] = await Promise.all([getCart(), getVariantLabels(), searchParams]);
+  const [cart, labels, { error, stock }] = await Promise.all([getCart(), getVariantLabels(), searchParams]);
   return (
     <article className="space-y-8">
       <h1 className="text-3xl font-bold text-center">Checkout</h1>
       {error && (
         <p role="alert" className="max-w-md mx-auto border border-red-400 rounded p-3 text-center">
           We couldn&apos;t start checkout just now. Please try again in a moment.
+        </p>
+      )}
+      {stock && (
+        <p role="alert" className="max-w-md mx-auto border border-accent rounded p-3 text-center">
+          Some items in your cart are no longer available in the quantity you
+          chose, so we&apos;ve updated your cart. Please review it before checking out.
         </p>
       )}
       {cart.length === 0 ? (

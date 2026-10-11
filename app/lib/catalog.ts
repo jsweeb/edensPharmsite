@@ -14,6 +14,11 @@
 export interface CatalogVariant {
   label: string;
   ingredients?: string[];
+  /**
+   * In stock at launch. Everything else shows "Out of Stock" until Vineyard
+   * is connected and reports real inventory.
+   */
+  available?: boolean;
 }
 
 export interface CatalogProduct {
@@ -67,12 +72,16 @@ const IMG = {
   banner: '/images/banner.png',
 };
 
-const FRAGRANCE_FORMATS: CatalogVariant[] = [
-  { label: 'Solid Perfume' },
-  { label: 'Perfume Oil' },
-  { label: 'Attar' },
-  { label: 'Spray' },
-];
+// Fragrance formats and concentrations. Solids come in EDT, EDP and
+// Extract; sprays in EDC, EDT, EDP, Parfum and Extract.
+const SOLID_CONCENTRATIONS = ['EDT', 'EDP', 'Extract'];
+const SPRAY_CONCENTRATIONS = ['EDC', 'EDT', 'EDP', 'Parfum', 'Extract'];
+type FragranceFormat = 'Solid' | 'Spray';
+const SANCTUM_LAUNCH: FragranceStock = { Solid: ['Extract'] };
+const FULL_LAUNCH: FragranceStock = { Solid: SOLID_CONCENTRATIONS, Spray: SPRAY_CONCENTRATIONS };
+
+/** Concentrations in stock at launch, per format. */
+type FragranceStock = Partial<Record<FragranceFormat, string[]>>;
 
 function elation(name: string, ingredients: string[]): CatalogProduct {
   return {
@@ -102,18 +111,27 @@ function crews(name: string, ingredients: string[]): CatalogProduct {
   };
 }
 
-function fragrance(name: string, notes: string[]): CatalogProduct {
+function fragrance(name: string, notes: string[], inStock: FragranceStock = {}): CatalogProduct {
+  const formats: [FragranceFormat, string[]][] = [
+    ['Solid', SOLID_CONCENTRATIONS],
+    ['Spray', SPRAY_CONCENTRATIONS],
+  ];
   return {
     slug: `sanctus-una-${name.toLowerCase()}-fragrance`,
     name: `${name} Fragrance`,
     line: 'sanctus-una',
     description: `${name} is a Sanctus Unā signature fragrance with notes of ${listToText(
       notes.length > 6 ? [...notes.slice(0, 5), 'more'] : notes,
-    )}. Available as a tallow‑and‑beeswax solid perfume, a perfume oil, an attar or a spray.`,
+    )}. Made as a tallow‑and‑beeswax solid perfume (EDT, EDP or Extract) or a spray (EDC, EDT, EDP, Parfum or Extract).`,
     image: IMG.sanctus,
     optionName: 'Format',
     ingredients: notes,
-    variants: FRAGRANCE_FORMATS,
+    variants: formats.flatMap(([format, concentrations]) =>
+      concentrations.map((c) => ({
+        label: `${format} – ${c}`,
+        available: inStock[format]?.includes(c) ?? false,
+      })),
+    ),
   };
 }
 
@@ -154,7 +172,7 @@ export const catalog: CatalogProduct[] = [
     image: IMG.hydrasal,
     optionName: 'Flavor',
     variants: [
-      { label: 'Raw', ingredients: ELECTROLYTES },
+      { label: 'Raw', ingredients: ELECTROLYTES, available: true },
       { label: 'Strawberry', ingredients: [...ELECTROLYTES, 'BeneDulce', 'Apple juice powder', 'Lime juice powder', 'Strawberry juice powder'] },
       { label: 'Triple Cherry', ingredients: [...ELECTROLYTES, 'BeneDulce', 'Apple juice powder', 'Bing cherry', 'Lambert cherry', 'Rainier cherry'] },
       { label: 'Citrus', ingredients: [...ELECTROLYTES, 'BeneDulce', 'Apple juice powder', 'Lemon juice powder', 'Lime juice powder', 'Orange juice powder'] },
@@ -260,9 +278,11 @@ export const catalog: CatalogProduct[] = [
   skincare('deodorant-balm', 'Deodorant Balm', 'Natural odor control in a tallow balm with arrowroot, magnesium hydroxide and zinc ricinoleate, scented with Sanctum.', ['Beef tallow', 'Beeswax', 'Jojoba oil', 'Arrowroot powder', 'Magnesium hydroxide', 'Zinc ricinoleate', 'Colloidal silver', 'Sanctum essential oil blend']),
 
   // ── Sanctus Unā fragrance ───────────────────────────────────────────────
-  fragrance('Sanctum', ['Jasmine sambac', 'Ylang ylang', 'Cinnamon bark', 'Cardamom', 'Black currant', 'Atlas cedarwood', 'Vetiver', 'Vanilla', 'Peru balsam', 'Labdanum', 'Benzoin', 'Frankincense sacra', 'Osmanthus', 'Tonka bean', 'Cypriol (nagarmotha)', 'Tolu balsam', 'Clary sage', 'Black pepper', 'White pepper', 'Saffron']),
-  fragrance('Redeemed', ['Elderflower', 'Gardenia', 'Frankincense sacra', 'Cacao', 'Citron', 'Pomelo', 'Myrrh']),
-  fragrance('Unbound', ['Honeysuckle', 'Texas cedarwood', 'Rose otto', 'Grapefruit', 'Yuzu', 'Balsam fir']),
+  // Launch lineup: Sanctum solid in Extract only; Redeemed and Unbound in
+  // every solid and spray concentration.
+  fragrance('Sanctum', ['Jasmine sambac', 'Ylang ylang', 'Cinnamon bark', 'Cardamom', 'Black currant', 'Atlas cedarwood', 'Vetiver', 'Vanilla', 'Peru balsam', 'Labdanum', 'Benzoin', 'Frankincense sacra', 'Osmanthus', 'Tonka bean', 'Cypriol (nagarmotha)', 'Tolu balsam', 'Clary sage', 'Black pepper', 'White pepper', 'Saffron'], SANCTUM_LAUNCH),
+  fragrance('Redeemed', ['Elderflower', 'Gardenia', 'Frankincense sacra', 'Cacao', 'Citron', 'Pomelo', 'Myrrh'], FULL_LAUNCH),
+  fragrance('Unbound', ['Honeysuckle', 'Texas cedarwood', 'Rose otto', 'Grapefruit', 'Yuzu', 'Balsam fir'], FULL_LAUNCH),
   fragrance('Stoic', ['Amyris', 'Beeswax absolute', 'Rosewood', 'Vanilla', 'Violet', 'Hay', 'Orris', 'Tonka bean', 'Benzoin', 'Amber', 'Atlas cedarwood', 'Pink peppercorn']),
   fragrance('Tranquil', ['Violet leaf', 'Petitgrain bigarade', 'Basil', 'Bergamot', 'Bitter orange peel', 'Mandarin peel', 'Neroli', 'Jasmine grandiflorum', 'Cypress', 'Hinoki', 'Elemi', 'Frankincense frereana', 'Benzoin']),
   fragrance('Clarity', ['Lemon', 'Pink pepper', 'French lavender', 'Neroli', 'Petitgrain bigarade', 'Virginia cedarwood', 'Patchouli', 'Benzoin', 'Vanilla']),
