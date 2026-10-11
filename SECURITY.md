@@ -13,7 +13,7 @@ Every pull request and push to `main` runs `.github/workflows/security.yml`:
 | --- | --- | --- |
 | CodeQL (`security-extended`) | Static analysis of all JS/TS; results uploaded as SARIF to the repo's Security tab | New alerts are reported in code scanning |
 | Dependency audit | `npm audit --omit=dev` | High or critical advisories in production dependencies |
-| Dependency review | Diffs dependency changes in the PR | Newly added high or critical advisories |
+| Dependency review (opt-in) | Diffs dependency changes in the PR; runs once the repo's Dependency graph is enabled and the `DEPENDENCY_REVIEW` repository variable is `true` | Newly added high or critical advisories |
 | Secret scan | Gitleaks over the full git history | Any committed credential |
 
 CodeQL and the dependency audit also run weekly on a schedule, so new

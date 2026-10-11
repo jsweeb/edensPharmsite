@@ -40,9 +40,12 @@ jobs:
       - name: Fail on high/critical advisories in production dependencies
         run: npm audit --omit=dev --audit-level=high
 
+  # Requires the repo's Dependency graph (Settings -> Code security). Once it
+  # is enabled, set the repository variable DEPENDENCY_REVIEW=true to turn
+  # this job on. Until then the dependency-audit job above gates advisories.
   dependency-review:
     name: Dependency review
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && vars.DEPENDENCY_REVIEW == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
