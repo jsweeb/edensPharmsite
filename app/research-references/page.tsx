@@ -43,7 +43,7 @@ export default function ResearchReferencesPage() {
         </h2>
         <p className="leading-relaxed">
           We choose ingredients by reading the literature first. Below are the{' '}
-          {researchReferences.length} published studies, reviews and reference texts we drew on
+          {researchReferences.length} studies, reviews and other sources we drew on
           when building our formulations, grouped by ingredient. Study types are noted so you
           can see what kind of evidence each one is: many are laboratory or animal studies,
           and their results may not carry over to people.
@@ -101,7 +101,8 @@ export default function ResearchReferencesPage() {
                   </a>
                   <p className="text-sm">
                     {ref.authors && `${ref.authors.replace(/\.?$/, '.')} `}
-                    <em>{ref.source}</em>, {ref.year}.{' '}
+                    <em>{ref.source}</em>
+                    {ref.year ? `, ${ref.year}.` : '.'}{' '}
                     <span className="inline-block px-2 text-xs border border-highlight rounded">
                       {ref.kind}
                     </span>

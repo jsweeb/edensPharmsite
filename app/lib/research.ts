@@ -4,10 +4,9 @@ import { catalog, type CatalogProduct } from './catalog';
  * Research references behind Eden's Pharm formulations.
  *
  * Sourced from the "Copy of research edens pharm" Google Sheet. Each link was
- * identified and de-duplicated. A paper is listed here only when it could be
- * confirmed and is not about cancer, so nothing on the page implies a disease
- * claim. The full list, including what was left out and why, lives in the
- * "Eden's Pharm Research Citations" sheet.
+ * identified and de-duplicated; links that could not be identified are left
+ * out. The full list, including those, lives in the "Eden's Pharm Research
+ * Citations" sheet. These are references, not product claims.
  */
 
 export interface ResearchTopic {
@@ -22,7 +21,8 @@ export interface ResearchReference {
   title: string;
   authors?: string;
   source: string;
-  year: number;
+  /** Omitted when the source is undated. */
+  year?: number;
   kind: string;
   url: string;
   /** Topic ids; the first is where the reference is listed. */
@@ -38,12 +38,15 @@ export const researchTopics: ResearchTopic[] = [
   { id: 'cinnamon', name: 'Cinnamon', ingredients: ['Cinnamon'] },
   { id: 'cordyceps', name: 'Cordyceps', ingredients: ['Cordyceps'] },
   { id: 'egcg', name: 'EGCG (green tea)', ingredients: ['EGCG'] },
+  { id: 'enoki', name: 'Enoki', ingredients: ['Enoki'] },
   { id: 'ginger', name: 'Ginger', ingredients: ['Ginger', 'Ginger powder', 'Ginger root powder', 'Ginger root juice powder'] },
   { id: 'ginseng', name: 'Ginseng', ingredients: ['Ginseng', 'Panax ginseng powder'] },
   { id: 'horny-goat-weed', name: 'Horny goat weed', ingredients: ['Horny goat weed'] },
+  { id: 'prunus-mume', name: 'Japanese apricot (Prunus mume)', ingredients: [] },
   { id: 'lithium-orotate', name: 'Lithium orotate', ingredients: ['Lithium orotate'] },
   { id: 'maca', name: 'Maca', ingredients: [] },
   { id: 'milk-thistle', name: 'Milk thistle', ingredients: ['Milk thistle'] },
+  { id: 'organ-meats', name: 'Organ meats', ingredients: [] },
   { id: 'reishi', name: 'Reishi', ingredients: ['Reishi'] },
   { id: 'sea-moss', name: 'Sea moss and seaweed', ingredients: ['Sea moss'] },
   { id: 'soursop', name: 'Soursop', ingredients: ['Soursop'] },
@@ -56,6 +59,16 @@ export const researchTopics: ResearchTopic[] = [
 
 export const researchReferences: ResearchReference[] = [
   {
+    id: 'ref-2',
+    title: 'Continuous intake of the Chaga mushroom (Inonotus obliquus) aqueous extract suppresses cancer progression and maintains body temperature in mice',
+    authors: 'Arata S, et al.',
+    source: 'Heliyon',
+    year: 2016,
+    kind: 'Animal study',
+    url: 'https://www.cell.com/heliyon/pdf/S2405-8440(16)30177-3.pdf',
+    topics: ['chaga'],
+  },
+  {
     id: 'ref-5',
     title: 'A potent anti-ageing and immunomodulatory activity of apricot seed standardized extract and its major compound amygdalin',
     authors: 'Ramadan MA, et al.',
@@ -64,6 +77,26 @@ export const researchReferences: ResearchReference[] = [
     kind: 'Lab study',
     url: 'https://www.researchgate.net/publication/357914541',
     topics: ['apricot-kernel'],
+  },
+  {
+    id: 'ref-6',
+    title: 'Amygdalin from Apricot Kernels Induces Apoptosis and Causes Cell Cycle Arrest in Cancer Cells: An Updated Review',
+    authors: 'Saleem M, et al.',
+    source: 'Anti-Cancer Agents in Medicinal Chemistry',
+    year: 2018,
+    kind: 'Review',
+    url: 'https://www.researchgate.net/publication/322310019',
+    topics: ['apricot-kernel'],
+  },
+  {
+    id: 'ref-7',
+    title: 'A review of Ganoderma lucidum (Reishi): a miraculous medicinal mushroom',
+    authors: 'Khatian N, Aslam M',
+    source: 'ResearchGate',
+    year: 2019,
+    kind: 'Review',
+    url: 'https://www.researchgate.net/publication/330988315',
+    topics: ['reishi'],
   },
   {
     id: 'ref-8',
@@ -103,6 +136,26 @@ export const researchReferences: ResearchReference[] = [
     kind: 'Review',
     url: 'http://www.isnff-jfb.com/index.php/JFB/article/view/191',
     topics: ['chaga'],
+  },
+  {
+    id: 'ref-12',
+    title: 'Effect of Milk Thistle (Silybum marianum) on the Pharmacokinetics of Irinotecan',
+    authors: 'van Erp NP, et al.',
+    source: 'Clinical Cancer Research',
+    year: 2005,
+    kind: 'Clinical trial',
+    url: 'https://aacrjournals.org/clincancerres/article/11/21/7800/194156/Effect-of-Milk-Thistle-Silybum-marianum-on-the',
+    topics: ['milk-thistle'],
+  },
+  {
+    id: 'ref-13',
+    title: "\"Fueling the Fire\" - Irish Sea-Moss Resulting in Jod-Basedow Phenomenon in a Patient With Grave's Disease",
+    authors: 'Khalifa M, et al.',
+    source: 'Journal of the Endocrine Society (ENDO 2021 abstract)',
+    year: 2021,
+    kind: 'Conference abstract',
+    url: 'https://academic.oup.com/jes/article/5/Supplement_1/A906/6240965',
+    topics: ['sea-moss'],
   },
   {
     id: 'ref-15',
@@ -165,6 +218,15 @@ export const researchReferences: ResearchReference[] = [
     topics: ['sea-moss'],
   },
   {
+    id: 'ref-21',
+    title: 'The Complete Functional Medicine Guide to Organ Meats',
+    authors: 'Cole W',
+    source: 'drwillcole.com',
+    kind: 'Article (not peer-reviewed)',
+    url: 'https://drwillcole.com/autoimmune-health/the-complete-functional-medicine-guide-to-organ-meats',
+    topics: ['organ-meats'],
+  },
+  {
     id: 'ref-22',
     title: 'Zinc Deficiency',
     authors: 'Maxfield L, et al.',
@@ -173,6 +235,16 @@ export const researchReferences: ResearchReference[] = [
     kind: 'Clinical reference',
     url: 'https://europepmc.org/article/NBK/nbk493231',
     topics: ['zinc'],
+  },
+  {
+    id: 'ref-23',
+    title: 'Ganoderma lucidum (Lingzhi or Reishi): A Medicinal Mushroom',
+    authors: 'Wachtel-Galor S, et al.',
+    source: 'Herbal Medicine: Biomolecular and Clinical Aspects (CRC Press)',
+    year: 2011,
+    kind: 'Book chapter',
+    url: 'https://europepmc.org/article/nbk/nbk92757',
+    topics: ['reishi'],
   },
   {
     id: 'ref-24',
@@ -203,6 +275,26 @@ export const researchReferences: ResearchReference[] = [
     kind: 'Review',
     url: 'https://link.springer.com/article/10.1007/s00005-008-0003-8',
     topics: ['zinc'],
+  },
+  {
+    id: 'ref-27',
+    title: 'Pharmacological and therapeutic potential of Cordyceps with special reference to Cordycepin',
+    authors: 'Tuli HS, et al.',
+    source: '3 Biotech',
+    year: 2014,
+    kind: 'Review',
+    url: 'https://link.springer.com/article/10.1007/s13205-013-0121-9',
+    topics: ['cordyceps'],
+  },
+  {
+    id: 'ref-28',
+    title: 'The anti-proliferative effect of apricot and peach kernel extracts on human colon cancer cells in vitro',
+    authors: 'Cassiem W, de Kock M',
+    source: 'BMC Complementary and Alternative Medicine',
+    year: 2019,
+    kind: 'Lab study',
+    url: 'https://link.springer.com/article/10.1186/s12906-019-2437-4',
+    topics: ['apricot-kernel'],
   },
   {
     id: 'ref-29',
@@ -295,6 +387,26 @@ export const researchReferences: ResearchReference[] = [
     topics: ['apricot-kernel'],
   },
   {
+    id: 'ref-41',
+    title: 'Ganoderma lucidum (Reishi mushroom) for cancer treatment',
+    authors: 'Jin X, et al.',
+    source: 'Cochrane Database of Systematic Reviews',
+    year: 2012,
+    kind: 'Systematic review',
+    url: 'https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD007731.pub2/abstract',
+    topics: ['reishi'],
+  },
+  {
+    id: 'ref-42',
+    title: 'Prunus Armeniaca L. Seed Extract and Its Amygdalin Containing Fraction Induced Mitochondrial-Mediated Apoptosis and Autophagy in Liver Carcinogenesis',
+    authors: 'Hosny S, et al.',
+    source: 'Anti-Cancer Agents in Medicinal Chemistry',
+    year: 2021,
+    kind: 'Animal study',
+    url: 'https://www.eurekaselect.com/article/107182',
+    topics: ['apricot-kernel'],
+  },
+  {
     id: 'ref-43',
     title: 'Dose Effects of Orally Administered Spirulina Suspension on Colonic Microbiota in Healthy Mice',
     authors: 'Hu J, et al.',
@@ -303,6 +415,16 @@ export const researchReferences: ResearchReference[] = [
     kind: 'Animal study',
     url: 'https://www.frontiersin.org/journals/cellular-and-infection-microbiology/articles/10.3389/fcimb.2019.00243/full',
     topics: ['spirulina'],
+  },
+  {
+    id: 'ref-44',
+    title: 'Anti-Cancer Properties of the Naturally Occurring Aphrodisiacs: Icariin and Its Derivatives',
+    authors: 'Tan HL, et al.',
+    source: 'Frontiers in Pharmacology',
+    year: 2016,
+    kind: 'Review',
+    url: 'https://www.frontiersin.org/journals/pharmacology/articles/10.3389/fphar.2016.00191/full',
+    topics: ['horny-goat-weed'],
   },
   {
     id: 'ref-45',
@@ -343,6 +465,16 @@ export const researchReferences: ResearchReference[] = [
     kind: 'Review',
     url: 'https://www.mdpi.com/1424-8247/15/10/1284',
     topics: ['chamomile'],
+  },
+  {
+    id: 'ref-51',
+    title: 'Anticancer Potential and Other Pharmacological Properties of Prunus armeniaca L.: An Updated Overview',
+    authors: 'Kitic D, et al.',
+    source: 'Plants',
+    year: 2022,
+    kind: 'Review',
+    url: 'https://www.mdpi.com/2223-7747/11/14/1885',
+    topics: ['apricot-kernel'],
   },
   {
     id: 'ref-52',
@@ -414,6 +546,16 @@ export const researchReferences: ResearchReference[] = [
     topics: ['egcg'],
   },
   {
+    id: 'ref-59',
+    title: 'Anticancer properties of Prunus mume extracts (Chinese plum, Japanese apricot)',
+    authors: 'Bailly C',
+    source: 'Journal of Ethnopharmacology',
+    year: 2020,
+    kind: 'Review',
+    url: 'https://www.sciencedirect.com/science/article/abs/pii/S0378874119330971',
+    topics: ['prunus-mume'],
+  },
+  {
     id: 'ref-60',
     title: 'Aphrodisiacs from plant and animal sources—A review of current scientific literature',
     authors: 'Melnyk JP, Marcone MF',
@@ -422,6 +564,16 @@ export const researchReferences: ResearchReference[] = [
     kind: 'Review',
     url: 'https://www.sciencedirect.com/science/article/abs/pii/S0963996911001451',
     topics: ['maca', 'horny-goat-weed'],
+  },
+  {
+    id: 'ref-61',
+    title: 'Oral administration of an Enoki mushroom protein FVE activates innate and adaptive immunity and induces anti-tumor activity against murine hepatocellular carcinoma',
+    authors: 'Chang HH, et al.',
+    source: 'International Immunopharmacology',
+    year: 2010,
+    kind: 'Animal study',
+    url: 'https://www.sciencedirect.com/science/article/abs/pii/S1567576909003567',
+    topics: ['enoki'],
   },
   {
     id: 'ref-62',
@@ -464,6 +616,16 @@ export const researchReferences: ResearchReference[] = [
     topics: ['sea-moss'],
   },
   {
+    id: 'ref-66',
+    title: 'Effects of the Gut microbiota on Amygdalin and its use as an anti-cancer therapy: Substantial review on the key components involved in altering dose efficacy and toxicity',
+    authors: 'Jaswal V, et al.',
+    source: 'Biochemistry and Biophysics Reports',
+    year: 2018,
+    kind: 'Review',
+    url: 'https://www.sciencedirect.com/science/article/pii/S2405580817302637',
+    topics: ['apricot-kernel'],
+  },
+  {
     id: 'ref-67',
     title: 'Performance and blood biochemistry profile of broiler chickens fed dietary turmeric (Curcuma longa) powder and cayenne pepper (Capsicum frutescens) powders as antioxidants',
     authors: 'Adegoke AV, et al.',
@@ -472,6 +634,16 @@ export const researchReferences: ResearchReference[] = [
     kind: 'Animal study',
     url: 'https://www.sciencedirect.com/science/article/pii/S2451943X16300163',
     topics: ['turmeric', 'cayenne'],
+  },
+  {
+    id: 'ref-68',
+    title: 'Diet Therapy for Cancer Prevention and Treatment Based on Traditional Persian Medicine',
+    authors: 'Javadi B',
+    source: 'Nutrition and Cancer',
+    year: 2018,
+    kind: 'Review',
+    url: 'https://www.tandfonline.com/doi/full/10.1080/01635581.2018.1446095',
+    topics: ['cinnamon', 'ginger'],
   },
   {
     id: 'ref-69',
@@ -517,7 +689,7 @@ export function referencesByTopic(): { topic: ResearchTopic; references: Researc
       topic,
       references: researchReferences
         .filter((r) => r.topics[0] === topic.id)
-        .sort((a, b) => b.year - a.year || a.title.localeCompare(b.title)),
+        .sort((a, b) => (b.year ?? 0) - (a.year ?? 0) || a.title.localeCompare(b.title)),
     }))
     .filter((group) => group.references.length > 0);
 }

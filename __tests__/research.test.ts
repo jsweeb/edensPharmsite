@@ -14,7 +14,7 @@ describe('research references', () => {
     for (const ref of researchReferences) {
       expect(ref.title.length).toBeGreaterThan(0);
       expect(ref.source.length).toBeGreaterThan(0);
-      expect(ref.year).toBeGreaterThan(1900);
+      if (ref.year !== undefined) expect(ref.year).toBeGreaterThan(1900);
       expect(ref.url).toMatch(/^https?:\/\/[^\s]+$/);
       expect(ref.url).not.toMatch(/chrome-extension:/);
     }
