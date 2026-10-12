@@ -18,7 +18,8 @@ const aboutLinks = [
   { href: '/research-references', label: 'Research References' },
 ];
 
-const linkClass = 'block py-2 md:py-0 hover:text-sand';
+const linkClass =
+  'relative block py-2 md:py-0 hover:text-sand transition-colors after:absolute after:left-0 after:-bottom-1 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-sand after:transition-transform after:duration-300 hover:after:scale-x-100';
 
 export default function NavBar() {
   const pathname = usePathname();
@@ -51,7 +52,10 @@ export default function NavBar() {
   }, [aboutOpen]);
 
   return (
-    <nav className="bg-earth border-b border-highlight text-accent" aria-label="Main">
+    <nav
+      className="sticky top-0 z-40 bg-earth/85 backdrop-blur-md border-b border-highlight/60 text-accent"
+      aria-label="Main"
+    >
       <div className="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
         <Link href="/" className="font-cursive text-3xl text-accent">
           Eden&apos;s Pharm

@@ -1,7 +1,8 @@
 name: Deploy
 
 # Builds the site on GitHub and uploads the self-contained standalone build to
-# Namecheap over FTPS, so the host never runs `npm install` or `next build`.
+# Namecheap over FTPS (with lftp), so the host never runs `npm install` or
+# `next build`.
 #
 # Setup (Settings -> Secrets and variables -> Actions):
 #   Secrets:   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD
@@ -37,21 +38,41 @@ jobs:
         run: npm ci
       - name: Build standalone site
         run: npm run build
+      - name: Install lftp
+        if: env.HAS_FTP == 'true'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+      # lftp reconnects and retries when the shared host drops the FTP
+      # connection mid-upload, skips files already on the server, and deletes
+      # files no longer in the build (except tmp/, logs and .htaccess, which
+      # the host manages). tmp/restart.txt goes last so Passenger restarts on
+      # the finished site. The `rm` clears a misplaced standalone/ folder left
+      # by an earlier deploy.
       - name: Upload to Namecheap
         if: env.HAS_FTP == 'true'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          local-dir: ./.next/standalone/
-          server-dir: ${{ vars.FTP_SERVER_DIR || './' }}
-          # The action excludes **/node_modules/** by default, but the
-          # standalone server needs its traced node_modules to start.
-          exclude: |
-            **/.git*
-            **/.git*/**
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ vars.FTP_SERVER_DIR || './' }}
+        run: |
+          # lftp appends the source folder name when the target ends in "/",
+          # so strip any trailing slash to upload into the app root itself.
+          TARGET="${FTP_SERVER_DIR%/}"
+          TARGET="${TARGET:-.}"
+          lftp --env-password -u "$FTP_USERNAME" "$FTP_SERVER" <<LFTP
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set net:timeout 30
+          set net:max-retries 20
+          set net:reconnect-interval-base 5
+          set net:reconnect-interval-multiplier 1
+          set cmd:fail-exit true
+          rm -r -f "$TARGET/standalone"
+          mirror --reverse --only-newer --delete --no-perms --parallel=3 --exclude-glob tmp/ --exclude-glob '*.log' --exclude-glob .htaccess --exclude-glob .ftpquota --verbose .next/standalone/ "$TARGET"
+          mkdir -fp "$TARGET/tmp"
+          put -O "$TARGET/tmp" .next/standalone/tmp/restart.txt
+          bye
+          LFTP
       - name: Upload skipped
         if: env.HAS_FTP != 'true'
         run: echo "::notice::Build succeeded. Add FTP_SERVER, FTP_USERNAME and FTP_PASSWORD secrets to deploy."

@@ -70,12 +70,22 @@ export interface ProductSummary {
   name: string;
   description: string;
   image: string;
+  /** Extra photos shown after the main image, e.g. an open and closed tin. */
+  gallery?: string[];
   /** Product line id (e.g. "hydrasal"), used to group the catalog. */
   line?: string;
 }
 
 function toSummary(p: CatalogProduct): ProductSummary {
-  return { id: p.slug, slug: p.slug, name: p.name, description: p.description, image: p.image, line: p.line };
+  return {
+    id: p.slug,
+    slug: p.slug,
+    name: p.name,
+    description: p.description,
+    image: p.image,
+    gallery: p.gallery,
+    line: p.line,
+  };
 }
 
 export async function listProducts(): Promise<ProductSummary[]> {

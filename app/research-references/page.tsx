@@ -1,75 +1,34 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
+import { productsForTopic, referencesByTopic, researchReferences } from '@/app/lib/research';
 
 export const metadata: Metadata = {
-  title: "Research References",
+  title: 'Research References',
   description:
-    "Browse a selection of academic papers and resources that inform the formulation of Eden's Pharm products.",
+    "The published studies and reviews on the botanicals and nutrients used in Eden's Pharm formulations, grouped by ingredient.",
 };
 
 /**
  * Research References page.
  *
- * Presents a curated list of scholarly articles and resources that
- * underpin Eden's Pharm formulations. Links open in new tabs. Only
- * approved images appear on the page. To keep the page concise, not
- * every reference from the original site is included, but the list
- * structure makes it easy to add more entries.
+ * Lists the papers behind Eden's Pharm formulations, grouped by ingredient,
+ * with links to the products that use each ingredient. The data lives in
+ * app/lib/research.ts.
  */
 export default function ResearchReferencesPage() {
-  const references: { title: string; url: string }[] = [
-    {
-      title: 'Effect of Milk Thistle (Silybum marianum) on the Chemoprevention and Treatment of Cancer',
-      url: 'https://aacrjournals.org',
-    },
-    {
-      title: 'Journal of the Endocrine Society Abstract',
-      url: 'https://academic.oup.com',
-    },
-    {
-      title: 'Journal of Sexual Medicine Home Page',
-      url: 'https://academic.oup.com/jsm',
-    },
-    {
-      title: 'Medicinal Uses of Seaweed in Traditional Chinese Medicine',
-      url: 'https://books.rsc.org',
-    },
-    {
-      title: 'The Complete Functional Medicine Guide to Organ Meats',
-      url: 'https://drwillcole.com',
-    },
-    {
-      title: 'Health Benefits of Kombucha Tea',
-      url: 'https://www.ncbi.nlm.nih.gov',
-    },
-    {
-      title: 'Traditional Chinese Medicine for COVID‑19',
-      url: 'https://www.ncbi.nlm.nih.gov',
-    },
-    {
-      title: 'A Review of Shilajit: Composition, Properties, and Therapeutic Potential',
-      url: 'https://gnanaganga.inflibnet.ac.in',
-    },
-    {
-      title: 'Beneficial Effects of Panax Ginseng on Cognitive Function (Heliyon)',
-      url: 'https://www.cell.com',
-    },
-    {
-      title: 'Sexual Medicine Reviews Abstracts',
-      url: 'https://academic.oup.com',
-    },
-  ];
+  const groups = referencesByTopic();
   return (
     <article className="space-y-12">
       {/* Hero */}
-      <section className="relative h-64 w-full overflow-hidden rounded">
+      <section className="light-sweep relative h-64 w-full overflow-hidden rounded">
         <Image
           src="/images/banner.png"
           alt="Eden's Pharm banner"
           fill
           sizes="100vw"
-          className="object-cover"
+          className="ken-burns object-cover"
           priority
         />
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
@@ -80,29 +39,87 @@ export default function ResearchReferencesPage() {
       </section>
       <section className="space-y-6">
         <h2 className="text-3xl font-bold font-cursive text-accent">
-          Scientific Backing for Eden’s Pharm Products
+          The Research Behind Our Ingredients
         </h2>
         <p className="leading-relaxed">
-          At Eden’s Pharm, we believe in radical transparency and efficacy
-          grounded in scientific research. Below is a selection of research
-          papers and academic references that inform our product formulations
-          and support the claims we make about our ingredients and dosages.
+          We choose ingredients by reading the literature first. Below are the{' '}
+          {researchReferences.length} studies, reviews and other sources we drew on
+          when building our formulations, grouped by ingredient. Study types are noted so you
+          can see what kind of evidence each one is: many are laboratory or animal studies,
+          and their results may not carry over to people.
         </p>
-        <ul className="list-disc list-inside space-y-2">
-          {references.map((ref) => (
-            <li key={ref.title}>
-              <a
-                href={ref.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-accent underline hover:text-sand"
-              >
-                {ref.title}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <nav aria-label="Ingredients">
+          <ul className="flex flex-wrap gap-2">
+            {groups.map(({ topic }) => (
+              <li key={topic.id}>
+                <a
+                  href={`#${topic.id}`}
+                  className="inline-block px-3 py-1 text-sm border border-highlight rounded hover:bg-highlight hover:text-white"
+                >
+                  {topic.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </section>
+      {groups.map(({ topic, references }) => {
+        const products = productsForTopic(topic);
+        return (
+          <section
+            key={topic.id}
+            id={topic.id}
+            aria-labelledby={`${topic.id}-heading`}
+            className="space-y-3 scroll-mt-24"
+          >
+            <h3 id={`${topic.id}-heading`} className="text-2xl font-cursive text-accent">
+              {topic.name}
+            </h3>
+            {products.length > 0 && (
+              <p className="text-sm">
+                Found in:{' '}
+                {products.map((product, i) => (
+                  <React.Fragment key={product.slug}>
+                    {i > 0 && ', '}
+                    <Link href={`/products/${product.slug}`} className="underline hover:text-accent">
+                      {product.name}
+                    </Link>
+                  </React.Fragment>
+                ))}
+              </p>
+            )}
+            <ul className="space-y-3">
+              {references.map((ref) => (
+                <li key={ref.id} className="border-l-2 border-highlight pl-3">
+                  <a
+                    href={ref.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent underline hover:text-sand"
+                  >
+                    {ref.title}
+                  </a>
+                  <p className="text-sm">
+                    {ref.authors && `${ref.authors.replace(/\.?$/, '.')} `}
+                    <em>{ref.source}</em>
+                    {ref.year ? `, ${ref.year}.` : '.'}{' '}
+                    <span className="inline-block px-2 text-xs border border-highlight rounded">
+                      {ref.kind}
+                    </span>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+      <p className="text-sm italic">
+        These references are shared for education and transparency. They describe research on
+        individual ingredients, not on Eden&apos;s Pharm products, and are not a claim that any
+        product diagnoses, treats, cures or prevents any disease. Talk to your healthcare provider
+        before starting a new supplement, especially if you are pregnant, nursing, taking
+        medication or managing a health condition.
+      </p>
     </article>
   );
 }

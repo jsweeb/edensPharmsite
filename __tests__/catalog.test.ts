@@ -1,3 +1,5 @@
+import { existsSync } from 'fs';
+import { join } from 'path';
 import { catalog, productLines, variantId } from '../app/lib/catalog';
 
 describe('product catalog', () => {
@@ -37,7 +39,7 @@ describe('product catalog', () => {
     );
   });
 
-  test('fragrances offer solid EDT/EDP/Extract and spray EDC/EDT/EDP/Parfum/Extract', () => {
+  test('fragrances offer solid, spray, oil and attar concentrations', () => {
     const sanctum = catalog.find((p) => p.slug === 'sanctus-una-sanctum-fragrance')!;
     expect(sanctum.variants.map((v) => v.label)).toEqual([
       'Solid – EDT',
@@ -48,6 +50,19 @@ describe('product catalog', () => {
       'Spray – EDP',
       'Spray – Parfum',
       'Spray – Extract',
+      'Oil – EDT',
+      'Oil – EDP',
+      'Oil – Parfum',
+      'Oil – Extract',
+      'Attar – Extract',
     ]);
+  });
+
+  test('every product photo exists in public/', () => {
+    for (const p of catalog) {
+      for (const src of [p.image, ...(p.gallery ?? [])]) {
+        expect(existsSync(join(__dirname, '..', 'public', src))).toBe(true);
+      }
+    }
   });
 });
