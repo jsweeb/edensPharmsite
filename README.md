@@ -99,9 +99,27 @@ npm run e2e
 
 ## Production
 
-Build once with `npm run build`, then start with either `npm start` or
-`node server.js` (for hosts such as cPanel/Passenger that need an entry
-file). Both honour the `PORT` environment variable.
+`npm run build` produces a self-contained server in `.next/standalone`
+(`output: 'standalone'` in `next.config.mjs`); the `postbuild` step copies
+`public/` and `.next/static/` into it. Run it with `npm start` or
+`node .next/standalone/server.js`. It honours the `PORT` environment variable
+and needs no `npm install` on the host.
+
+### Namecheap (cPanel) deployment
+
+`.github/workflows/deploy.yml` builds on every push to `main` and uploads
+`.next/standalone` to Namecheap over FTPS:
+
+1. In cPanel → **FTP Accounts**, create an FTP account whose directory is the
+   app folder (e.g. `edenspharm-app`).
+2. In GitHub → Settings → Secrets and variables → Actions, add secrets
+   `FTP_SERVER` (e.g. `ftp.edenspharm.com`), `FTP_USERNAME`, `FTP_PASSWORD`.
+3. In cPanel → **Setup Node.js App**, create an app with Node 22, Production
+   mode, application root `edenspharm-app`, startup file `server.js`, and add
+   the runtime environment variables (SamCart, Vineyard). Do not use "Run NPM
+   Install"; dependencies ship with the build.
+4. Run the Deploy workflow (Actions → Deploy → Run workflow) or push to `main`.
+   Each deploy updates `tmp/restart.txt`, which restarts the app.
 
 ## Environment variables
 
