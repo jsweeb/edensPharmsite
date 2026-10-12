@@ -86,7 +86,9 @@ function tinPhotos(name: string): [string, string] {
 // Extract; sprays in EDC, EDT, EDP, Parfum and Extract.
 const SOLID_CONCENTRATIONS = ['EDT', 'EDP', 'Extract'];
 const SPRAY_CONCENTRATIONS = ['EDC', 'EDT', 'EDP', 'Parfum', 'Extract'];
-type FragranceFormat = 'Solid' | 'Spray';
+const OIL_CONCENTRATIONS = ['EDT', 'EDP', 'Parfum', 'Extract'];
+const ATTAR_CONCENTRATIONS = ['Extract'];
+type FragranceFormat = 'Solid' | 'Spray' | 'Oil' | 'Attar';
 const SANCTUM_LAUNCH: FragranceStock = { Solid: ['Extract'] };
 const FULL_LAUNCH: FragranceStock = { Solid: SOLID_CONCENTRATIONS, Spray: SPRAY_CONCENTRATIONS };
 
@@ -125,6 +127,8 @@ function fragrance(name: string, notes: string[], inStock: FragranceStock = {}):
   const formats: [FragranceFormat, string[]][] = [
     ['Solid', SOLID_CONCENTRATIONS],
     ['Spray', SPRAY_CONCENTRATIONS],
+    ['Oil', OIL_CONCENTRATIONS],
+    ['Attar', ATTAR_CONCENTRATIONS],
   ];
   return {
     slug: `sanctus-una-${name.toLowerCase()}-fragrance`,
@@ -132,7 +136,7 @@ function fragrance(name: string, notes: string[], inStock: FragranceStock = {}):
     line: 'sanctus-una',
     description: `${name} is a Sanctus Unā signature fragrance with notes of ${listToText(
       notes.length > 6 ? [...notes.slice(0, 5), 'more'] : notes,
-    )}. Made as a tallow‑and‑beeswax solid perfume (EDT, EDP or Extract) or a spray (EDC, EDT, EDP, Parfum or Extract).`,
+    )}. Made as a tallow‑and‑beeswax solid perfume (EDT, EDP or Extract), a spray (EDC, EDT, EDP, Parfum or Extract), a perfume oil (EDT, EDP, Parfum or Extract) or an attar (Extract).`,
     image: tinPhotos(name)[0],
     gallery: [tinPhotos(name)[1]],
     optionName: 'Format',
