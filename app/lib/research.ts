@@ -1,0 +1,523 @@
+import { catalog, type CatalogProduct } from './catalog';
+
+/**
+ * Research references behind Eden's Pharm formulations.
+ *
+ * Sourced from the "Copy of research edens pharm" Google Sheet. Each link was
+ * identified and de-duplicated. A paper is listed here only when it could be
+ * confirmed and is not about cancer, so nothing on the page implies a disease
+ * claim. The full list, including what was left out and why, lives in the
+ * "Eden's Pharm Research Citations" sheet.
+ */
+
+export interface ResearchTopic {
+  id: string;
+  name: string;
+  /** Catalog ingredient names (exact, case-insensitive) this topic covers. */
+  ingredients: string[];
+}
+
+export interface ResearchReference {
+  id: string;
+  title: string;
+  authors?: string;
+  source: string;
+  year: number;
+  kind: string;
+  url: string;
+  /** Topic ids; the first is where the reference is listed. */
+  topics: string[];
+}
+
+export const researchTopics: ResearchTopic[] = [
+  { id: 'black-pepper', name: 'Black pepper', ingredients: ['Black pepper'] },
+  { id: 'black-seed', name: 'Black seed', ingredients: ['Black seed'] },
+  { id: 'cayenne', name: 'Cayenne pepper', ingredients: ['Cayenne pepper'] },
+  { id: 'chaga', name: 'Chaga', ingredients: ['Chaga'] },
+  { id: 'chamomile', name: 'Chamomile', ingredients: ['Chamomile'] },
+  { id: 'cinnamon', name: 'Cinnamon', ingredients: ['Cinnamon'] },
+  { id: 'cordyceps', name: 'Cordyceps', ingredients: ['Cordyceps'] },
+  { id: 'egcg', name: 'EGCG (green tea)', ingredients: ['EGCG'] },
+  { id: 'ginger', name: 'Ginger', ingredients: ['Ginger', 'Ginger powder', 'Ginger root powder', 'Ginger root juice powder'] },
+  { id: 'ginseng', name: 'Ginseng', ingredients: ['Ginseng', 'Panax ginseng powder'] },
+  { id: 'horny-goat-weed', name: 'Horny goat weed', ingredients: ['Horny goat weed'] },
+  { id: 'lithium-orotate', name: 'Lithium orotate', ingredients: ['Lithium orotate'] },
+  { id: 'maca', name: 'Maca', ingredients: [] },
+  { id: 'milk-thistle', name: 'Milk thistle', ingredients: ['Milk thistle'] },
+  { id: 'reishi', name: 'Reishi', ingredients: ['Reishi'] },
+  { id: 'sea-moss', name: 'Sea moss and seaweed', ingredients: ['Sea moss'] },
+  { id: 'soursop', name: 'Soursop', ingredients: ['Soursop'] },
+  { id: 'spirulina', name: 'Spirulina', ingredients: ['Spirulina'] },
+  { id: 'apricot-kernel', name: 'Stone fruit seed (apricot kernel)', ingredients: ['Stone fruit seed powder'] },
+  { id: 'turmeric', name: 'Turmeric', ingredients: ['Turmeric', 'Curcumin'] },
+  { id: 'zinc', name: 'Zinc', ingredients: ['Zinc orotate'] },
+  { id: 'sexual-health-reviews', name: 'Sexual health botanicals (reviews)', ingredients: [] },
+];
+
+export const researchReferences: ResearchReference[] = [
+  {
+    id: 'ref-5',
+    title: 'A potent anti-ageing and immunomodulatory activity of apricot seed standardized extract and its major compound amygdalin',
+    authors: 'Ramadan MA, et al.',
+    source: 'Tropical Journal of Natural Product Research',
+    year: 2020,
+    kind: 'Lab study',
+    url: 'https://www.researchgate.net/publication/357914541',
+    topics: ['apricot-kernel'],
+  },
+  {
+    id: 'ref-8',
+    title: 'Phytochemical and biological assessments on Lipidium meyenii (maca) and Epimidium sagittatum (horny goat weed)',
+    source: 'Pakistan Journal of Pharmaceutical Sciences',
+    year: 2017,
+    kind: 'Animal study',
+    url: 'https://www.researchgate.net/publication/313384720',
+    topics: ['maca', 'horny-goat-weed'],
+  },
+  {
+    id: 'ref-9',
+    title: 'Milk thistle (Silybum marianum): a valuable medicinal plant with several therapeutic purposes',
+    authors: 'Valková V, et al.',
+    source: 'Journal of Microbiology, Biotechnology and Food Sciences',
+    year: 2020,
+    kind: 'Review',
+    url: 'https://www.researchgate.net/publication/339031798',
+    topics: ['milk-thistle'],
+  },
+  {
+    id: 'ref-10',
+    title: 'Therapeutic Role of Ginger (Zingiber officinale) - A Review',
+    authors: 'Kausar T, et al.',
+    source: 'Journal of Pharmaceutical Research International',
+    year: 2021,
+    kind: 'Review',
+    url: 'http://geographical.go2journals.com/id/eprint/377/',
+    topics: ['ginger'],
+  },
+  {
+    id: 'ref-11',
+    title: 'Bioactive compounds and bioactive properties of chaga (Inonotus obliquus) mushroom: a review',
+    authors: 'Peng H, Shahidi F',
+    source: 'Journal of Food Bioactives',
+    year: 2020,
+    kind: 'Review',
+    url: 'http://www.isnff-jfb.com/index.php/JFB/article/view/191',
+    topics: ['chaga'],
+  },
+  {
+    id: 'ref-15',
+    title: 'An Analysis of Popular Online Erectile Dysfunction Supplements',
+    authors: 'Balasubramanian A, et al.',
+    source: 'The Journal of Sexual Medicine',
+    year: 2019,
+    kind: 'Review',
+    url: 'https://academic.oup.com/jsm/article-abstract/16/6/843/6966876',
+    topics: ['horny-goat-weed', 'maca', 'ginseng'],
+  },
+  {
+    id: 'ref-16',
+    title: 'Erectogenic and neurotrophic effects of icariin, a purified extract of horny goat weed (Epimedium spp.) in vitro and in vivo',
+    authors: 'Shindel AW, et al.',
+    source: 'The Journal of Sexual Medicine',
+    year: 2010,
+    kind: 'Animal study',
+    url: 'https://academic.oup.com/jsm/article-abstract/7/4_part_1/1518/6848867',
+    topics: ['horny-goat-weed'],
+  },
+  {
+    id: 'ref-17',
+    title: 'Natural Aphrodisiacs—A Review of Selected Sexual Enhancers',
+    authors: 'West E, Krychman M',
+    source: 'Sexual Medicine Reviews',
+    year: 2015,
+    kind: 'Review',
+    url: 'https://academic.oup.com/smr/article-abstract/3/4/279/6827636',
+    topics: ['ginseng', 'maca', 'horny-goat-weed'],
+  },
+  {
+    id: 'ref-18',
+    title: 'Efficacy and Safety of Common Ingredients in Aphrodisiacs Used for Erectile Dysfunction: A Review',
+    authors: 'Srivatsav A, et al.',
+    source: 'Sexual Medicine Reviews',
+    year: 2020,
+    kind: 'Review',
+    url: 'https://academic.oup.com/smr/article-abstract/8/3/431/6880228',
+    topics: ['horny-goat-weed', 'maca', 'ginseng'],
+  },
+  {
+    id: 'ref-19',
+    title: 'Phytopharmacy: An Evidence-Based Guide to Herbal Medicinal Products',
+    authors: 'Edwards SE, et al.',
+    source: 'Wiley-Blackwell',
+    year: 2015,
+    kind: 'Book chapter',
+    url: 'https://books.google.com/books?id=KGu5BgAAQBAJ&pg=PA210',
+    topics: ['horny-goat-weed'],
+  },
+  {
+    id: 'ref-20',
+    title: 'Medicinal Uses of Seaweed in Traditional Chinese Medicine',
+    authors: 'Oshima E',
+    source: 'Traditional Chinese Medicine: Scientific Basis for Its Use (Royal Society of Chemistry)',
+    year: 2013,
+    kind: 'Book chapter',
+    url: 'https://books.rsc.org/books/edited-volume/1815/chapter-abstract/2125647/Medicinal-Uses-of-Seaweed-in-Traditional-Chinese',
+    topics: ['sea-moss'],
+  },
+  {
+    id: 'ref-22',
+    title: 'Zinc Deficiency',
+    authors: 'Maxfield L, et al.',
+    source: 'StatPearls (NCBI Bookshelf)',
+    year: 2023,
+    kind: 'Clinical reference',
+    url: 'https://europepmc.org/article/NBK/nbk493231',
+    topics: ['zinc'],
+  },
+  {
+    id: 'ref-24',
+    title: 'Potential Effects of Horny Goat Weed (Epimedium grandiflorum) on The Level of Fertility in Male Rats Infected with Cadmium Chloride: Biochemical and Histopathological Study',
+    authors: 'Nasef AZ, El-Sheikh NA',
+    source: 'Alexandria Science Exchange Journal',
+    year: 2023,
+    kind: 'Animal study',
+    url: 'https://journals.ekb.eg/article_315705.html',
+    topics: ['horny-goat-weed'],
+  },
+  {
+    id: 'ref-25',
+    title: 'Single doses of Panax ginseng (G115) reduce blood glucose levels and improve cognitive performance during sustained mental activity',
+    authors: 'Reay JL, et al.',
+    source: 'Journal of Psychopharmacology',
+    year: 2005,
+    kind: 'Clinical trial',
+    url: 'https://journals.sagepub.com/doi/abs/10.1177/0269881105053286',
+    topics: ['ginseng'],
+  },
+  {
+    id: 'ref-26',
+    title: 'Modulating the immune response by oral zinc supplementation: a single approach for multiple diseases',
+    authors: 'Overbeck S, et al.',
+    source: 'Archivum Immunologiae et Therapiae Experimentalis',
+    year: 2008,
+    kind: 'Review',
+    url: 'https://link.springer.com/article/10.1007/s00005-008-0003-8',
+    topics: ['zinc'],
+  },
+  {
+    id: 'ref-29',
+    title: 'Nutritional and Therapeutic Potential of Soursop',
+    authors: 'Afzaal M, et al.',
+    source: 'Journal of Food Quality',
+    year: 2022,
+    kind: 'Review',
+    url: 'https://onlinelibrary.wiley.com/doi/10.1155/2022/8828358',
+    topics: ['soursop'],
+  },
+  {
+    id: 'ref-30',
+    title: 'Milk thistle in liver diseases: past, present, future',
+    authors: 'Abenavoli L, et al.',
+    source: 'Phytotherapy Research',
+    year: 2010,
+    kind: 'Review',
+    url: 'https://onlinelibrary.wiley.com/doi/abs/10.1002/ptr.3207',
+    topics: ['milk-thistle'],
+  },
+  {
+    id: 'ref-31',
+    title: 'Silybum marianum (milk thistle) and its main constituent, silymarin, as a potential therapeutic plant in metabolic syndrome: A review',
+    authors: 'Tajmohammadi A, et al.',
+    source: 'Phytotherapy Research',
+    year: 2018,
+    kind: 'Review',
+    url: 'https://onlinelibrary.wiley.com/doi/abs/10.1002/ptr.6153',
+    topics: ['milk-thistle'],
+  },
+  {
+    id: 'ref-32',
+    title: 'Milk thistle (Silybum marianum): A concise overview on its chemistry, pharmacological, and nutraceutical uses in liver diseases',
+    authors: 'Abenavoli L, et al.',
+    source: 'Phytotherapy Research',
+    year: 2018,
+    kind: 'Review',
+    url: 'https://onlinelibrary.wiley.com/doi/abs/10.1002/ptr.6171',
+    topics: ['milk-thistle'],
+  },
+  {
+    id: 'ref-33',
+    title: 'Safety and toxicity of silymarin, the major constituent of milk thistle extract: An updated review',
+    authors: 'Soleimani V, et al.',
+    source: 'Phytotherapy Research',
+    year: 2019,
+    kind: 'Review',
+    url: 'https://onlinelibrary.wiley.com/doi/abs/10.1002/ptr.6361',
+    topics: ['milk-thistle'],
+  },
+  {
+    id: 'ref-34',
+    title: 'Ganoderma lucidum (Reishi) an edible mushroom; a comprehensive and critical review of its nutritional, cosmeceutical, mycochemical, pharmacological, clinical, and toxicological properties',
+    authors: 'Ahmad R, et al.',
+    source: 'Phytotherapy Research',
+    year: 2021,
+    kind: 'Review',
+    url: 'https://onlinelibrary.wiley.com/doi/abs/10.1002/ptr.7215',
+    topics: ['reishi'],
+  },
+  {
+    id: 'ref-35',
+    title: 'Ginger in gastrointestinal disorders: A systematic review of clinical trials',
+    authors: 'Nikkhah Bodagh M, et al.',
+    source: 'Food Science & Nutrition',
+    year: 2019,
+    kind: 'Systematic review',
+    url: 'https://onlinelibrary.wiley.com/doi/full/10.1002/fsn3.807',
+    topics: ['ginger'],
+  },
+  {
+    id: 'ref-36',
+    title: 'Hypolipidemic, Antioxidant, and Antiinflammatory Activities of Microalgae Spirulina',
+    authors: 'Deng R, Chow TJ',
+    source: 'Cardiovascular Therapeutics',
+    year: 2010,
+    kind: 'Review',
+    url: 'https://onlinelibrary.wiley.com/doi/full/10.1111/j.1755-5922.2010.00200.x',
+    topics: ['spirulina'],
+  },
+  {
+    id: 'ref-39',
+    title: 'Effects of Apricot and Apricot Kernels on Human Health and Nutrition: A Review of Recent Human Research',
+    authors: 'Jaafar HJ',
+    source: 'Technium BioChemMed',
+    year: 2021,
+    kind: 'Review',
+    url: 'https://techniumscience.com/index.php/biochemmed/article/view/4328',
+    topics: ['apricot-kernel'],
+  },
+  {
+    id: 'ref-43',
+    title: 'Dose Effects of Orally Administered Spirulina Suspension on Colonic Microbiota in Healthy Mice',
+    authors: 'Hu J, et al.',
+    source: 'Frontiers in Cellular and Infection Microbiology',
+    year: 2019,
+    kind: 'Animal study',
+    url: 'https://www.frontiersin.org/journals/cellular-and-infection-microbiology/articles/10.3389/fcimb.2019.00243/full',
+    topics: ['spirulina'],
+  },
+  {
+    id: 'ref-45',
+    title: 'Icariin, an Anti-atherosclerotic Drug from Chinese Medicinal Herb Horny Goat Weed',
+    authors: 'Fang J, Zhang Y',
+    source: 'Frontiers in Pharmacology',
+    year: 2017,
+    kind: 'Review',
+    url: 'https://www.frontiersin.org/journals/pharmacology/articles/10.3389/fphar.2017.00734/full',
+    topics: ['horny-goat-weed'],
+  },
+  {
+    id: 'ref-46',
+    title: 'Potential Therapeutic Strategies for Renal Fibrosis: Cordyceps and Related Products',
+    authors: 'Tan W, et al.',
+    source: 'Frontiers in Pharmacology',
+    year: 2022,
+    kind: 'Review',
+    url: 'https://www.frontiersin.org/journals/pharmacology/articles/10.3389/fphar.2022.932172/full',
+    topics: ['cordyceps'],
+  },
+  {
+    id: 'ref-49',
+    title: 'Herbs for Erectile Dysfunction',
+    authors: 'Yarnell E',
+    source: 'Alternative and Complementary Therapies',
+    year: 2015,
+    kind: 'Review',
+    url: 'https://www.liebertpub.com/doi/abs/10.1089/act.2015.29029.eya',
+    topics: ['sexual-health-reviews'],
+  },
+  {
+    id: 'ref-50',
+    title: 'A Comprehensive Study of Therapeutic Applications of Chamomile',
+    authors: 'Sah A, et al.',
+    source: 'Pharmaceuticals',
+    year: 2022,
+    kind: 'Review',
+    url: 'https://www.mdpi.com/1424-8247/15/10/1284',
+    topics: ['chamomile'],
+  },
+  {
+    id: 'ref-52',
+    title: 'Acute effect of different concentrations of cayenne pepper cataplasm on sensory-motor functions and serum levels of inflammation-related biomarkers in healthy subjects',
+    authors: 'Sarabon N, et al.',
+    source: 'European Journal of Translational Myology',
+    year: 2018,
+    kind: 'Clinical trial',
+    url: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5895990/',
+    topics: ['cayenne'],
+  },
+  {
+    id: 'ref-53',
+    title: 'Iron and Physical Activity: Bioavailability Enhancers, Properties of Black Pepper (Bioperine®) and Potential Applications',
+    authors: 'Fernández-Lázaro D, et al.',
+    source: 'Nutrients',
+    year: 2020,
+    kind: 'Review',
+    url: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7353321/',
+    topics: ['black-pepper'],
+  },
+  {
+    id: 'ref-54',
+    title: 'Nutritional supplements and erectile dysfunction',
+    authors: 'Chung A, et al.',
+    source: 'Molecular Mechanisms of Nutritional Interventions and Supplements for the Management of Sexual Dysfunction and Benign Prostatic Hyperplasia (Academic Press)',
+    year: 2021,
+    kind: 'Book chapter',
+    url: 'https://www.sciencedirect.com/science/article/abs/pii/B9780128197653000091',
+    topics: ['sexual-health-reviews'],
+  },
+  {
+    id: 'ref-55',
+    title: 'Milk thistle for the treatment of liver disease: a systematic review and meta-analysis',
+    authors: 'Jacobs BP, et al.',
+    source: 'The American Journal of Medicine',
+    year: 2002,
+    kind: 'Systematic review',
+    url: 'https://www.sciencedirect.com/science/article/abs/pii/S0002934302012445',
+    topics: ['milk-thistle'],
+  },
+  {
+    id: 'ref-56',
+    title: 'Icariin inhibits atherosclerosis progress in Apoe null mice by downregulating CX3CR1 in macrophage',
+    source: 'Biochemical and Biophysical Research Communications',
+    year: 2016,
+    kind: 'Animal study',
+    url: 'https://www.sciencedirect.com/science/article/abs/pii/S0006291X16301188',
+    topics: ['horny-goat-weed'],
+  },
+  {
+    id: 'ref-57',
+    title: 'Therapeutic effect of high-dose green tea extract on weight reduction: A randomized, double-blind, placebo-controlled clinical trial',
+    authors: 'Chen IJ, et al.',
+    source: 'Clinical Nutrition',
+    year: 2016,
+    kind: 'Clinical trial',
+    url: 'https://www.sciencedirect.com/science/article/abs/pii/S026156141500134X',
+    topics: ['egcg'],
+  },
+  {
+    id: 'ref-58',
+    title: 'Molecular understanding of Epigallocatechin gallate (EGCG) in cardiovascular and metabolic diseases',
+    authors: 'Eng QY, et al.',
+    source: 'Journal of Ethnopharmacology',
+    year: 2018,
+    kind: 'Review',
+    url: 'https://www.sciencedirect.com/science/article/abs/pii/S0378874117309893',
+    topics: ['egcg'],
+  },
+  {
+    id: 'ref-60',
+    title: 'Aphrodisiacs from plant and animal sources—A review of current scientific literature',
+    authors: 'Melnyk JP, Marcone MF',
+    source: 'Food Research International',
+    year: 2011,
+    kind: 'Review',
+    url: 'https://www.sciencedirect.com/science/article/abs/pii/S0963996911001451',
+    topics: ['maca', 'horny-goat-weed'],
+  },
+  {
+    id: 'ref-62',
+    title: 'A toxicological evaluation of lithium orotate',
+    authors: 'Murbach TS, et al.',
+    source: 'Regulatory Toxicology and Pharmacology',
+    year: 2021,
+    kind: 'Animal study',
+    url: 'https://www.sciencedirect.com/science/article/pii/S0273230021001136',
+    topics: ['lithium-orotate'],
+  },
+  {
+    id: 'ref-63',
+    title: 'The effect of Nigella sativa (black seed) supplementation on body weight and body composition: A GRADE-assessed systematic review and dose-response meta-analysis of randomized controlled trials',
+    authors: 'Naghsh N, et al.',
+    source: 'Journal of Functional Foods',
+    year: 2023,
+    kind: 'Systematic review',
+    url: 'https://www.sciencedirect.com/science/article/pii/S1756464623001652',
+    topics: ['black-seed'],
+  },
+  {
+    id: 'ref-64',
+    title: 'Culinary Spice Plants in Dietary Supplement Products and Tested in Clinical Trials',
+    authors: 'Saldanha LG, et al.',
+    source: 'Advances in Nutrition',
+    year: 2016,
+    kind: 'Review',
+    url: 'https://www.sciencedirect.com/science/article/pii/S2161831322006573',
+    topics: ['cayenne', 'cinnamon', 'ginger', 'black-pepper', 'turmeric'],
+  },
+  {
+    id: 'ref-65',
+    title: 'In vitro antioxidant study of polyphenol from red seaweeds dichotomously branched gracilaria Gracilaria edulis and robust sea moss Hypnea valentiae',
+    authors: 'Mahendran S, et al.',
+    source: 'Toxicology Reports',
+    year: 2021,
+    kind: 'Lab study',
+    url: 'https://www.sciencedirect.com/science/article/pii/S2214750021001335',
+    topics: ['sea-moss'],
+  },
+  {
+    id: 'ref-67',
+    title: 'Performance and blood biochemistry profile of broiler chickens fed dietary turmeric (Curcuma longa) powder and cayenne pepper (Capsicum frutescens) powders as antioxidants',
+    authors: 'Adegoke AV, et al.',
+    source: 'Veterinary and Animal Science',
+    year: 2018,
+    kind: 'Animal study',
+    url: 'https://www.sciencedirect.com/science/article/pii/S2451943X16300163',
+    topics: ['turmeric', 'cayenne'],
+  },
+  {
+    id: 'ref-69',
+    title: 'Influence of long-term consumption of bitter apricot seeds on risk factors for cardiovascular diseases',
+    source: 'Journal of Environmental Science and Health, Part B',
+    year: 2018,
+    kind: 'Clinical trial',
+    url: 'https://www.tandfonline.com/doi/abs/10.1080/03601234.2017.1421841',
+    topics: ['apricot-kernel'],
+  },
+  {
+    id: 'ref-70',
+    title: 'The beneficial effects of cinnamon among patients with metabolic diseases: A systematic review and dose-response meta-analysis of randomized-controlled trials',
+    authors: 'Sohouli MH, et al.',
+    source: 'Critical Reviews in Food Science and Nutrition',
+    year: 2022,
+    kind: 'Systematic review',
+    url: 'https://www.tandfonline.com/doi/abs/10.1080/10408398.2021.1896473',
+    topics: ['cinnamon'],
+  },
+];
+
+function productIngredients(product: CatalogProduct): string[] {
+  return [...(product.ingredients ?? []), ...product.variants.flatMap((v) => v.ingredients ?? [])];
+}
+
+/**
+ * Ingestible catalog products that contain any ingredient covered by the topic.
+ * Sanctus Unā skincare and fragrance are left out: the research is about
+ * eating or drinking an ingredient, not wearing it as a scent note.
+ */
+export function productsForTopic(topic: ResearchTopic): CatalogProduct[] {
+  const wanted = new Set(topic.ingredients.map((i) => i.toLowerCase()));
+  return catalog.filter(
+    (p) => p.line !== 'sanctus-una' && productIngredients(p).some((i) => wanted.has(i.toLowerCase())),
+  );
+}
+
+/** Topics with their references, in topic order; topics with no references are skipped. */
+export function referencesByTopic(): { topic: ResearchTopic; references: ResearchReference[] }[] {
+  return researchTopics
+    .map((topic) => ({
+      topic,
+      references: researchReferences
+        .filter((r) => r.topics[0] === topic.id)
+        .sort((a, b) => b.year - a.year || a.title.localeCompare(b.title)),
+    }))
+    .filter((group) => group.references.length > 0);
+}
