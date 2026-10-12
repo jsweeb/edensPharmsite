@@ -42,8 +42,11 @@ jobs:
         if: env.HAS_FTP == 'true'
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
       # lftp reconnects and retries when the shared host drops the FTP
-      # connection mid-upload, and skips files already on the server.
-      # tmp/restart.txt goes last so Passenger restarts on the finished site.
+      # connection mid-upload, skips files already on the server, and deletes
+      # files no longer in the build (except tmp/, logs and .htaccess, which
+      # the host manages). tmp/restart.txt goes last so Passenger restarts on
+      # the finished site. The `rm` clears a misplaced standalone/ folder left
+      # by an earlier deploy.
       - name: Upload to Namecheap
         if: env.HAS_FTP == 'true'
         env:
@@ -52,6 +55,10 @@ jobs:
           LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_SERVER_DIR: ${{ vars.FTP_SERVER_DIR || './' }}
         run: |
+          # lftp appends the source folder name when the target ends in "/",
+          # so strip any trailing slash to upload into the app root itself.
+          TARGET="${FTP_SERVER_DIR%/}"
+          TARGET="${TARGET:-.}"
           lftp --env-password -u "$FTP_USERNAME" "$FTP_SERVER" <<LFTP
           set ftp:ssl-force true
           set ftp:ssl-protect-data true
@@ -60,9 +67,10 @@ jobs:
           set net:reconnect-interval-base 5
           set net:reconnect-interval-multiplier 1
           set cmd:fail-exit true
-          mirror --reverse --only-newer --no-perms --parallel=3 --exclude-glob tmp/ --verbose .next/standalone/ "$FTP_SERVER_DIR"
-          mkdir -fp "$FTP_SERVER_DIR/tmp"
-          put -O "$FTP_SERVER_DIR/tmp" .next/standalone/tmp/restart.txt
+          rm -r -f "$TARGET/standalone"
+          mirror --reverse --only-newer --delete --no-perms --parallel=3 --exclude-glob tmp/ --exclude-glob '*.log' --exclude-glob .htaccess --verbose .next/standalone/ "$TARGET"
+          mkdir -fp "$TARGET/tmp"
+          put -O "$TARGET/tmp" .next/standalone/tmp/restart.txt
           bye
           LFTP
       - name: Upload skipped
