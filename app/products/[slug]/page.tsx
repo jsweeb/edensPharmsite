@@ -1,9 +1,10 @@
 import React from 'react';
-import Image from 'next/image';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getInventory, getProduct } from '@/app/lib/vineyard';
 import ProductVariantSelector from '@/components/ProductVariantSelector';
+import ProductGallery from '@/components/ProductGallery';
+import Reveal from '@/components/Reveal';
 
 interface Props {
   params: Promise<{
@@ -57,28 +58,23 @@ export default async function ProductPage({ params }: Props) {
   );
   const variantsWithIngredients = product.variants.filter((v) => v.ingredients?.length);
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <h1 className="text-3xl font-bold">{product.name}</h1>
-      <div className="relative w-full h-64 overflow-hidden rounded">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          priority
-          sizes="(min-width: 896px) 896px, 100vw"
-          className="object-cover"
-        />
-      </div>
-      <p>{product.description}</p>
-      <div>
-        <h2 className="text-xl font-bold mb-2">Select {optionName}</h2>
-        <ProductVariantSelector
-          variants={variants}
-          optionName={optionName}
-        />
+    <div className="max-w-6xl mx-auto space-y-10">
+      <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+        <ProductGallery images={[product.image, ...(product.gallery ?? [])]} name={product.name} />
+        <div className="space-y-6">
+          <h1 className="font-cursive text-5xl text-accent">{product.name}</h1>
+          <p className="leading-relaxed">{product.description}</p>
+          <div>
+            <h2 className="text-xl font-bold mb-2">Select {optionName}</h2>
+            <ProductVariantSelector
+              variants={variants}
+              optionName={optionName}
+            />
+          </div>
+        </div>
       </div>
       {(product.ingredients?.length || variantsWithIngredients.length > 0) && (
-        <section className="space-y-4" aria-labelledby="ingredients-heading">
+        <Reveal as="section" className="space-y-4">
           <h2 id="ingredients-heading" className="text-xl font-bold">
             Ingredients
           </h2>
@@ -94,7 +90,7 @@ export default async function ProductPage({ params }: Props) {
           ) : (
             <p className="text-sm">{product.ingredients!.join(', ')}</p>
           )}
-        </section>
+        </Reveal>
       )}
     </div>
   );

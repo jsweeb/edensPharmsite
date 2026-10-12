@@ -27,6 +27,8 @@ export interface CatalogProduct {
   line: ProductLineId;
   description: string;
   image: string;
+  /** Extra photos shown on the product page after the main image. */
+  gallery?: string[];
   /** What the variant picker is called on the product page. */
   optionName: string;
   ingredients?: string[];
@@ -66,11 +68,19 @@ export const productLines: { id: ProductLineId; name: string; tagline: string }[
 const ELECTROLYTES = ['Sodium chloride', 'Potassium chloride', 'Magnesium chloride'];
 const IMG = {
   hydrasal: '/images/hydrasal.png',
-  elation: '/images/elation.png',
-  benedulce: '/images/benedulce.jpg',
+  elation: '/images/products/elation-logo.webp',
+  benedulce: '/images/products/benedulce-logo.webp',
+  callalux: '/images/products/callalux-logo.webp',
   sanctus: '/images/sanctus.png',
+  healingSalve: '/images/products/healing-salve.webp',
   banner: '/images/banner.png',
 };
+
+/** Open and closed tin photos for a fragrance, e.g. fragrance-sanctum-open.webp. */
+function tinPhotos(name: string): [string, string] {
+  const base = `/images/products/fragrance-${name.toLowerCase()}`;
+  return [`${base}-open.webp`, `${base}-closed.webp`];
+}
 
 // Fragrance formats and concentrations. Solids come in EDT, EDP and
 // Extract; sprays in EDC, EDT, EDP, Parfum and Extract.
@@ -123,7 +133,8 @@ function fragrance(name: string, notes: string[], inStock: FragranceStock = {}):
     description: `${name} is a Sanctus Unā signature fragrance with notes of ${listToText(
       notes.length > 6 ? [...notes.slice(0, 5), 'more'] : notes,
     )}. Made as a tallow‑and‑beeswax solid perfume (EDT, EDP or Extract) or a spray (EDC, EDT, EDP, Parfum or Extract).`,
-    image: IMG.sanctus,
+    image: tinPhotos(name)[0],
+    gallery: [tinPhotos(name)[1]],
     optionName: 'Format',
     ingredients: notes,
     variants: formats.flatMap(([format, concentrations]) =>
@@ -134,6 +145,9 @@ function fragrance(name: string, notes: string[], inStock: FragranceStock = {}):
     ),
   };
 }
+
+/** Skincare sold in the amber jar; each has a jar photo at jar-<slug>.webp. */
+const JAR_PHOTOS = new Set(['face-balm-renew', 'body-butter', 'beard-butter', 'baby-balm', 'deodorant-balm']);
 
 function skincare(
   slug: string,
@@ -148,7 +162,7 @@ function skincare(
     name,
     line: 'sanctus-una',
     description,
-    image: IMG.sanctus,
+    image: JAR_PHOTOS.has(slug) ? `/images/products/jar-${slug}.webp` : IMG.sanctus,
     optionName,
     ingredients,
     variants,
@@ -253,7 +267,10 @@ export const catalog: CatalogProduct[] = [
 
   // ── Sanctus Unā skincare ────────────────────────────────────────────────
   skincare('face-balm-renew', 'Renew Face Balm', 'Our hero moisturizing facial balm: grass‑fed tallow with jojoba, squalane, sea buckthorn and rosehip oils, lightly scented with cedarwood, geranium, copaiba and lavender.', ['Grass-fed beef tallow', 'Jojoba oil', 'Squalane (olive-derived)', 'Sea buckthorn oil', 'Vitamin E oil', 'Rosehip oil', 'Oat oil', 'Arrowroot powder', 'Cedarwood, geranium, copaiba and lavender essential oils']),
-  skincare('healing-salve', 'Healing Salve', 'A soothing, protective salve of tallow, beeswax and calendula with lavender, tea tree and frankincense.', ['Beef tallow', 'Beeswax', 'Jojoba oil', 'Calendula oil', 'Vitamin E oil', 'Lavender, tea tree and frankincense essential oils']),
+  {
+    ...skincare('healing-salve', 'Healing Salve', 'A soothing, protective salve of tallow, beeswax and calendula with lavender, tea tree and frankincense that works with your body to help restore your skin to its natural beauty.', ['Beef tallow', 'Beeswax', 'Jojoba oil', 'Calendula oil', 'Vitamin E oil', 'Lavender, tea tree and frankincense essential oils']),
+    image: IMG.healingSalve,
+  },
   skincare('bar-soap', 'Sanctum Bar Soap', 'A cleansing tallow bar soap scented with our signature Sanctum blend.', ['Tallow', 'Coconut oil', 'Olive oil', 'Lye', 'Castor oil', 'Sanctum essential oil blend']),
   skincare('body-butter', 'Sanctum Body Butter', 'Whipped tallow and shea body butter for full‑body hydration, scented with Sanctum.', ['Beef tallow', 'Shea butter', 'Jojoba oil', 'Arrowroot powder', 'Vitamin E oil', 'Sanctum essential oil blend']),
   skincare('lotion-bar', 'Sanctum Lotion Bar', 'Portable, mess‑free hydration in a solid tallow and cocoa butter bar, scented with Sanctum.', ['Beef tallow', 'Beeswax', 'Cocoa butter', 'Jojoba oil', 'Sanctum essential oil blend']),
@@ -298,7 +315,7 @@ export const catalog: CatalogProduct[] = [
     line: 'callalux',
     description:
       'Rich custard ice cream made with heavy cream, egg yolks and sea salt, sweetened entirely with BeneDulce. Ten flavors inspired by places around the world.',
-    image: IMG.benedulce,
+    image: IMG.callalux,
     optionName: 'Flavor',
     variants: [
       { label: 'Madagascar Bourbon', ingredients: ['Vanilla bean'] },

@@ -22,13 +22,13 @@ export default function ResearchReferencesPage() {
   return (
     <article className="space-y-12">
       {/* Hero */}
-      <section className="relative h-64 w-full overflow-hidden rounded">
+      <section className="light-sweep relative h-64 w-full overflow-hidden rounded">
         <Image
           src="/images/banner.png"
           alt="Eden's Pharm banner"
           fill
           sizes="100vw"
-          className="object-cover"
+          className="ken-burns object-cover"
           priority
         />
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
@@ -70,7 +70,7 @@ export default function ResearchReferencesPage() {
             key={topic.id}
             id={topic.id}
             aria-labelledby={`${topic.id}-heading`}
-            className="space-y-3 scroll-mt-4"
+            className="space-y-3 scroll-mt-24"
           >
             <h3 id={`${topic.id}-heading`} className="text-2xl font-cursive text-accent">
               {topic.name}

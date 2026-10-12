@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { listProducts, getProduct, getInventory, type ProductSummary } from '@/app/lib/vineyard';
 import { productLines } from '@/app/lib/catalog';
+import Reveal from '@/components/Reveal';
 
 export const metadata: Metadata = {
   title: 'Products',
@@ -65,14 +66,14 @@ export default async function ProductsPage() {
   return (
     <div className="space-y-12">
       <header className="text-center space-y-4">
-        <h1 className="text-3xl font-bold">Products</h1>
+        <h1 className="font-cursive text-5xl text-accent">Products</h1>
         <nav aria-label="Product lines">
           <ul className="flex flex-wrap justify-center gap-3">
             {sections.map((section) => (
               <li key={section.id}>
                 <a
                   href={`#${section.id}`}
-                  className="inline-block px-3 py-1 border border-highlight rounded hover:bg-highlight hover:text-white"
+                  className="inline-block rounded-full border border-highlight px-4 py-1 transition hover:-translate-y-0.5 hover:bg-highlight hover:text-white"
                 >
                   {section.name}
                 </a>
@@ -82,7 +83,7 @@ export default async function ProductsPage() {
         </nav>
       </header>
       {sections.map((section) => (
-        <section key={section.id} id={section.id} aria-labelledby={`${section.id}-heading`} className="space-y-4 scroll-mt-4">
+        <section key={section.id} id={section.id} aria-labelledby={`${section.id}-heading`} className="space-y-4 scroll-mt-24">
           <div className="text-center">
             <h2 id={`${section.id}-heading`} className="text-2xl md:text-3xl font-cursive text-accent">
               {section.name}
@@ -90,32 +91,40 @@ export default async function ProductsPage() {
             {section.tagline && <p className="text-sm">{section.tagline}</p>}
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {section.products.map((product) => (
-              <div
-                key={product.id}
-                className="border border-highlight rounded-lg overflow-hidden bg-earth flex flex-col"
-              >
-                <div className="relative h-40 w-full">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                    className="object-cover"
-                  />
+            {section.products.map((product, i) => (
+              <Reveal key={product.id} delay={(i % 3) * 110} className="h-full">
+                <div className="group flex h-full flex-col overflow-hidden rounded-xl border border-highlight/70 bg-earth transition duration-300 hover:-translate-y-1.5 hover:border-accent hover:shadow-[0_12px_40px_-12px_rgb(127_255_212/0.45)]">
+                  <div className="relative aspect-[4/3] w-full overflow-hidden">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                      className="object-cover transition duration-700 group-hover:scale-105"
+                    />
+                    {product.gallery?.[0] && (
+                      <Image
+                        src={product.gallery[0]}
+                        alt=""
+                        fill
+                        sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                        className="object-cover opacity-0 transition duration-700 group-hover:scale-105 group-hover:opacity-100"
+                      />
+                    )}
+                  </div>
+                  <div className="p-4 flex-1 flex flex-col">
+                    <h3 className="text-lg font-bold mb-1">{product.name}</h3>
+                    <span className="text-sm font-semibold text-accent mb-2">{product.status}</span>
+                    <p className="flex-1 text-sm mb-4">{product.description}</p>
+                    <Link
+                      href={`/products/${product.slug}`}
+                      className="shine mt-auto inline-block self-start rounded-full px-5 py-2 bg-accent text-earth transition hover:bg-highlight hover:text-white"
+                    >
+                      View Details<span className="sr-only"> for {product.name}</span>
+                    </Link>
+                  </div>
                 </div>
-                <div className="p-4 flex-1 flex flex-col">
-                  <h3 className="text-lg font-bold mb-1">{product.name}</h3>
-                  <span className="text-sm font-semibold text-accent mb-2">{product.status}</span>
-                  <p className="flex-1 text-sm mb-4">{product.description}</p>
-                  <Link
-                    href={`/products/${product.slug}`}
-                    className="mt-auto inline-block px-4 py-2 bg-accent text-earth rounded hover:bg-highlight hover:text-white"
-                  >
-                    View Details<span className="sr-only"> for {product.name}</span>
-                  </Link>
-                </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </section>

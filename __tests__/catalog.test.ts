@@ -1,3 +1,5 @@
+import { existsSync } from 'fs';
+import { join } from 'path';
 import { catalog, productLines, variantId } from '../app/lib/catalog';
 
 describe('product catalog', () => {
@@ -49,5 +51,13 @@ describe('product catalog', () => {
       'Spray – Parfum',
       'Spray – Extract',
     ]);
+  });
+
+  test('every product photo exists in public/', () => {
+    for (const p of catalog) {
+      for (const src of [p.image, ...(p.gallery ?? [])]) {
+        expect(existsSync(join(__dirname, '..', 'public', src))).toBe(true);
+      }
+    }
   });
 });
