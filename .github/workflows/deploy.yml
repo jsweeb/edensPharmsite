@@ -47,6 +47,11 @@ jobs:
           protocol: ftps
           local-dir: ./.next/standalone/
           server-dir: ${{ vars.FTP_SERVER_DIR || './' }}
+          # The action excludes **/node_modules/** by default, but the
+          # standalone server needs its traced node_modules to start.
+          exclude: |
+            **/.git*
+            **/.git*/**
       - name: Upload skipped
         if: env.HAS_FTP != 'true'
         run: echo "::notice::Build succeeded. Add FTP_SERVER, FTP_USERNAME and FTP_PASSWORD secrets to deploy."
