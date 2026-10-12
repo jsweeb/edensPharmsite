@@ -246,7 +246,13 @@ export const catalog: CatalogProduct[] = [
 
   // ── Elation ─────────────────────────────────────────────────────────────
   elation('Energy', ['Ashwagandha', 'EGCG', 'Ginger', 'Ginseng', "Lion's mane", 'Sea moss', 'Spirulina', 'Zinc orotate']),
-  elation('Estrogen', ['Ashwagandha', 'Butterfly pea flower', 'Milk thistle', 'Moringa', 'Reishi', 'Saffron', 'Sea moss']),
+  {
+    ...elation('Estrogen', ['Ashwagandha', 'Butterfly pea flower', 'Milk thistle', 'Moringa', 'Reishi', 'Saffron', 'Sea moss']),
+    description:
+      'Elation Estrogen is a Chai Rose adaptogenic tea of ashwagandha, butterfly pea flower, milk thistle, moringa, reishi, saffron and sea moss, sweetened with BeneDulce.',
+    optionName: 'Flavor',
+    variants: [{ label: 'Chai Rose' }],
+  },
   elation('Focus', ['Ashwagandha', 'Cayenne pepper', 'Ginseng', "Lion's mane", 'Lithium orotate']),
   elation('Gut Health', ['Cinnamon', 'Ginger', 'Milk thistle', 'Saffron', 'Sea moss', 'Spirulina']),
   elation('Heart', ['Cayenne pepper', 'Cinnamon', 'Cordyceps', 'Enoki', 'Reishi', 'Saffron', 'Soursop']),
