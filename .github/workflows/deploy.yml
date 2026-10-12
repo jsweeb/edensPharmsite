@@ -68,7 +68,7 @@ jobs:
           set net:reconnect-interval-multiplier 1
           set cmd:fail-exit true
           rm -r -f "$TARGET/standalone"
-          mirror --reverse --only-newer --delete --no-perms --parallel=3 --exclude-glob tmp/ --exclude-glob '*.log' --exclude-glob .htaccess --verbose .next/standalone/ "$TARGET"
+          mirror --reverse --only-newer --delete --no-perms --parallel=3 --exclude-glob tmp/ --exclude-glob '*.log' --exclude-glob .htaccess --exclude-glob .ftpquota --verbose .next/standalone/ "$TARGET"
           mkdir -fp "$TARGET/tmp"
           put -O "$TARGET/tmp" .next/standalone/tmp/restart.txt
           bye
